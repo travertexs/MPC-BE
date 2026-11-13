@@ -2,7 +2,7 @@ name: Build MPC-BE
 
 on:
   push:
-    branches-ignore: [windows-arm64]
+    branches-ignore: [windows-arm64, 'release/*-arm64']
     paths-ignore:
       - .github/workflows/main.yml
       - '**.txt'

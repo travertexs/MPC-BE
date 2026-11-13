@@ -32,7 +32,4 @@ meson install -C dav1d-build
 cp "$(find "$tmp/deps" -name libdav1d.a -print -quit)" "$out/"
 cp "$($target-clang -print-file-name=libmingwex.a)" "$out/"
 cp "$($target-clang -print-libgcc-file-name)" "$out/libbuiltins.a"
-# Prepend installed public headers so the structures match the linked libraries.
-export CPATH="$tmp/deps/include"
-make -C "$root/src/ExtLib/ffmpeg" -f ffmpeg.mak ARM64=yes -j"$(nproc)" "ARM64_INCLUDES=-I$tmp/deps/include"
-cp "$root/_bin/lib/Release_ARM64/ffmpeg.lib" "$out/"
+bash "$root/contrib/arm64/build-ffmpeg.sh" "$root" "$tmp/deps" "$tmp"

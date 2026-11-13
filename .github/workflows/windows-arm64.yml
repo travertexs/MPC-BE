@@ -1,8 +1,11 @@
 name: Windows ARM64
 on:
   push:
-    branches: [windows-arm64]
+    branches: ['release/1.9.3-arm64']
   workflow_dispatch:
+env:
+  MPCBE_STABLE_RELEASE: 1
+  RELEASE_VERSION: 1.9.3
 permissions:
   contents: read
 concurrency:
@@ -20,7 +23,7 @@ jobs:
         id: cache
         with:
           path: libarm64
-          key: codecs-arm64-v1-${{ hashFiles('contrib/arm64/codecs.sh', 'src/ExtLib/ffmpeg/**', 'src/ExtLib/vvdec/vvdec.h') }}
+          key: codecs-arm64-v1-${{ hashFiles('contrib/arm64/*.sh', 'contrib/arm64/ffmpeg-*', 'src/ExtLib/ffmpeg/**', 'src/ExtLib/vvdec/vvdec.h') }}
       - if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update -qq
@@ -113,9 +116,9 @@ jobs:
             _bin/mpc-be_ARM64/Shaders/
             _bin/mpc-be_ARM64/Shaders11/
           if-no-files-found: error
-  playback:
+  installer:
     needs: player
-    runs-on: windows-11-arm
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
@@ -123,9 +126,39 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: MPC-BE-Windows-ARM64
-          path: player
+          path: payload
+      - name: Package native ARM64 Windows Installer
+        shell: pwsh
+        run: |
+          dotnet tool install wix --version 5.0.2 --tool-path "$env:RUNNER_TEMP/wix"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & "$env:RUNNER_TEMP/wix/wix.exe" build distrib/mpc-be-arm64.wxs -arch arm64 -d "Version=$env:RELEASE_VERSION" -bindpath "payload=$PWD/payload" -o "installer/MPC-BE.$env:RELEASE_VERSION.arm64.msi"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MPC-BE-ARM64-installer
+          path: installer/*.msi
+          if-no-files-found: error
+  playback:
+    needs: installer
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: MPC-BE-ARM64-installer
+          path: installer
       - uses: actions/download-artifact@v4
         with:
           name: test-media
           path: media
-      - run: ./contrib/arm64/test-playback.ps1
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64-codecs
+          path: codec-check
+      - name: Verify FFmpeg NEON dispatch and calculations
+        run: ./codec-check/ffmpeg-dsp-check.exe
+      - name: Install, verify version, play media and uninstall
+        run: ./contrib/arm64/test-install.ps1 -Version $env:RELEASE_VERSION

@@ -10,7 +10,7 @@ The Windows ARM64 workflow cross-compiles the vendored FFmpeg source on Ubuntu w
 
 | Component | Windows ARM64 implementation |
 | --- | --- |
-| FFmpeg | MPC-BE's patched codec and processing sources, using their portable C implementations. The upstream MPC-BE source snapshot omits most of FFmpeg's AArch64 DSP backends. |
+| FFmpeg | FFmpeg revision 11ef8d60d6, the revision used by MPC-BE 1.9.3. The build overlays MPC-BE’s modified sources and its codec registry on the full upstream tree, then compiles the enabled AArch64 and NEON routines. The Windows Arm test checks the active vector-multiply implementation and its output. |
 | dav1d and FDK AAC | The workflow builds dav1d 1.5.4 and FDK AAC 2.0.3 from source for ARM64 using LLVM-MinGW for dav1d and MSVC for FDK AAC. The FFmpeg interfaces use matching public headers. dav1d includes AArch64 assembly. |
 | MFC, ATL, Windows SDK and DirectShow | Microsoft's ARM64 compiler, static libraries and SDK imports. The DirectShow BaseClasses sources come from MPC-BE's pinned submodule. |
 | Audio, pixel conversion and subtitle routines | Existing SSE intrinsics above the codec layer compile to Arm instructions through a pinned sse2neon header. AVX2-only subtitle routines use the 128-bit implementation on Arm. |

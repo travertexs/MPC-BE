@@ -1,7 +1,8 @@
+param([string]$PlayerDirectory = "player")
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
-$exe = (Resolve-Path player/mpc-be-arm64.exe).Path
-$images = @(Get-Item $exe) + @(Get-ChildItem player -Recurse -Filter *.dll)
+$exe = (Resolve-Path (Join-Path $PlayerDirectory 'mpc-be-arm64.exe')).Path
+$images = @(Get-Item $exe) + @(Get-ChildItem $PlayerDirectory -Recurse -Filter *.dll)
 if ($images.Count -lt 3) { throw 'Player resource DLLs are missing' }
 foreach ($file in $images) {
     $b = [IO.File]::ReadAllBytes($file.FullName)
