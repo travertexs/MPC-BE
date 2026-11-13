@@ -29,7 +29,7 @@ python3 - "$tmp/configure/config.h" <<'PY'
 from pathlib import Path
 import re, sys
 target = Path(sys.argv[1]).read_text()
-features = re.compile(r'(?:ARCH_AARCH64|AS_ARCH_LEVEL|HAVE_(?:ARMV8|VFP|NEON|DOTPROD|I8MM|SVE2?|SME2?|SME_I16I64)(?:_INLINE|_EXTERNAL)?|HAVE_AS_ARCH.*|HAVE_INTRINSICS_NEON|HAVE_INLINE_ASM|HAVE_FAST_64BIT|CONFIG_PIC)')
+features = re.compile(r'(?:ARCH_AARCH64|AS_ARCH_LEVEL|HAVE_(?:ARMV8|ARM_AES|ARM_CRC|VFP|NEON|DOTPROD|I8MM|PMULL|EOR3|SVE2?|SME2?|SME_I16I64)(?:_INLINE|_EXTERNAL)?|HAVE_AS_ARCH.*|HAVE_INTRINSICS_NEON|HAVE_INLINE_ASM|HAVE_FAST_64BIT|CONFIG_PIC)')
 lines = []
 for name, value in re.findall(r'^#define (\w+) (.+)$', target, re.M):
     if features.fullmatch(name):
