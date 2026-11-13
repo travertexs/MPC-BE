@@ -180,7 +180,12 @@ BEGIN
             VALUE "CompanyName", MPC_COMP_NAME_STR
             VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
-#ifdef _WIN64
+#if defined(MPC_ARM64)
+            VALUE "FileDescription", "MPC-BE ARM64"
+            VALUE "InternalName", "mpc-be-arm64"
+            VALUE "OriginalFilename", "mpc-be-arm64.exe"
+            VALUE "ProductName", "MPC-BE ARM64"
+#elif defined(_WIN64)
             VALUE "FileDescription", "MPC-BE x64"
             VALUE "InternalName", "mpc-be64"
             VALUE "OriginalFilename", "mpc-be64.exe"

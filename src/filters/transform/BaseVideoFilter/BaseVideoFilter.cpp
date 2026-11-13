@@ -20,7 +20,11 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <mmintrin.h>
+#endif
 #include <memory.h>
 #include <mfapi.h>
 #include "BaseVideoFilter.h"

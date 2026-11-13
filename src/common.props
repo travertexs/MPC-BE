@@ -10,6 +10,15 @@
     <LinkIncremental Condition="$(Configuration.Contains('Debug'))">true</LinkIncremental>
     <LinkIncremental Condition="$(Configuration.Contains('Release'))">false</LinkIncremental>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='ARM64'">
+    <ClCompile>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;MPC_ARM64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Zo /Zc:throwingNew /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>

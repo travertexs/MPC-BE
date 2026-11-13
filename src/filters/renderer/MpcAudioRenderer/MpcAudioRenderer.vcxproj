@@ -88,6 +88,12 @@
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;$(SolutionDir)src\ExtLib\ffmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioDevice.cpp" />
     <ClCompile Include="AudioSyncClock.cpp" />
@@ -129,7 +135,7 @@
     <ProjectReference Include="$(SolutionDir)src\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj" Condition="'$(Platform)'!='ARM64'">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses.vcxproj">

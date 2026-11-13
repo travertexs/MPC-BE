@@ -17,6 +17,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\AdaptiveLoopFilter.cpp" />
@@ -53,138 +57,138 @@
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitPartitioner.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\UnitTools.cpp" />
     <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\WeightPrediction.cpp" />
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\AdaptiveLoopFilter_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\AdaptiveLoopFilter_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Buffer_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Buffer_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterpolationFilter_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterpolationFilter_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterPred_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\InterPred_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\IntraPred_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\IntraPred_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\LoopFilter_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\LoopFilter_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Picture_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Picture_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Quant_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Quant_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\RdCost_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\RdCost_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\SampleAdaptiveOffset_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\SampleAdaptiveOffset_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx2\Trafo_avx2.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\AdaptiveLoopFilter_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\AdaptiveLoopFilter_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Buffer_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Buffer_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterpolationFilter_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterpolationFilter_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterPred_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\InterPred_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\IntraPred_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\IntraPred_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\LoopFilter_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\LoopFilter_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Picture_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Picture_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Quant_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Quant_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\RdCost_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\RdCost_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\SampleAdaptiveOffset_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\SampleAdaptiveOffset_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Trafo_avx.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\avx\Trafo_avx.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_AVX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.cpp" />
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp" />
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\AdaptiveLoopFilter_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\CommonDefX86.cpp" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\InitX86.cpp" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\AdaptiveLoopFilter_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Buffer_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Buffer_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterpolationFilter_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterpolationFilter_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterPred_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\InterPred_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\IntraPred_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\IntraPred_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\LoopFilter_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\LoopFilter_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Picture_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Picture_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Quant_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Quant_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\RdCost_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\RdCost_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\SampleAdaptiveOffset_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\SampleAdaptiveOffset_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Trafo_sse41.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse41\Trafo_sse41.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE41;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\AdaptiveLoopFilter_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\AdaptiveLoopFilter_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Buffer_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Buffer_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterpolationFilter_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterpolationFilter_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterPred_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\InterPred_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\IntraPred_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\IntraPred_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\LoopFilter_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\LoopFilter_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Picture_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Picture_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Quant_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Quant_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\RdCost_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\RdCost_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\SampleAdaptiveOffset_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\SampleAdaptiveOffset_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Trafo_sse42.cpp">
+    <ClCompile Include="vvdec\vvdec\source\Lib\CommonLib\x86\sse42\Trafo_sse42.cpp" Condition="'$(Platform)'!='ARM64'">
       <PreprocessorDefinitions>USE_SSE42;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="vvdec\vvdec\source\Lib\DecoderLib\AnnexBread.cpp" />
@@ -310,7 +314,8 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;TARGET_SIMD_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'=='ARM64'">WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Platform)'!='ARM64'">WIN32;_WINDOWS;TARGET_SIMD_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4100;4127;4244;4245;4389;4456;4457;4458;4459;4505;4701;4702;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>.;./vvdec;./vvdec/vvdec/include;./vvdec/vvdec/source/Lib;./vvdec/vvdec/source/Lib/DecoderLib;./vvdec/vvdec/source/Lib/CommonLib;./vvdec/vvdec/source/Lib/CommonLib/x86;./vvdec/vvdec/source/Lib/libmd5;./vvdec/vvdec/thirdparty;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>

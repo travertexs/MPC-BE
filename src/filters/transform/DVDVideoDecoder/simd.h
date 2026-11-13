@@ -23,6 +23,9 @@
 #define _SIMD_H_
 
 #include "simd_common.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 
 #define SSE2I_INSTRUCTION(instruction,function) \
  static __forceinline void instruction(__m128i &dst,const __m128i &src) {dst=function(dst,		   src);} \

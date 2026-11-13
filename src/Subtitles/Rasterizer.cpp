@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include <intrin.h>
 #include "Rasterizer.h"
 #include "SeparableFilter.h"

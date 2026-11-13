@@ -116,7 +116,11 @@ static bool IsPtrAligned(T* ptr, size_t align)
 // https://github.com/AviSynth/AviSynthPlus/blob/master/avs_core/convert/intel/convert_yv12_sse.cpp
 // commit b287f15beb44293b9efc26f774e5b4fd219687d0 on 2020-05-14
 
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>
+#endif
 
 
 /* YV12 -> YUY2 conversion */

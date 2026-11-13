@@ -19,8 +19,12 @@
 
 #pragma once
 
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>
 #include <smmintrin.h>
+#endif
 
 // Load the dithering coefficients for this line
 // reg   - register to load coefficients into

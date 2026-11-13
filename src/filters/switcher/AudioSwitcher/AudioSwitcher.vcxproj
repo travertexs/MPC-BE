@@ -88,6 +88,12 @@
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src;$(SolutionDir)src\ExtLib\ffmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioNormalizer.cpp" />
     <ClCompile Include="AudioSwitcher.cpp" />
@@ -121,7 +127,7 @@
     <ProjectReference Include="$(SolutionDir)src\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\ExtLib\ffmpeg\ffmpeg.vcxproj" Condition="'$(Platform)'!='ARM64'">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)src\ExtLib\BaseClasses.vcxproj">

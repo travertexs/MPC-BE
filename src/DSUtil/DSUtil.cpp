@@ -31,7 +31,11 @@
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
 #include <basestruct.h>
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>
+#endif
 #include <d3d9.h>
 #include <mvrInterfaces.h>
 

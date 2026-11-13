@@ -19,7 +19,11 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>
+#endif
 #include "PixelUtils_VirtualDub.h"
 
 #pragma warning(disable: 4799) // warning C4799: function has no EMMS instruction

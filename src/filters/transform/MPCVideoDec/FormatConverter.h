@@ -21,6 +21,9 @@
 #pragma once
 
 #include "IMPCVideoDec.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include <stdint.h>
 #include <mfobjects.h>
 #include "../BaseVideoFilter/VideoFormats.h"

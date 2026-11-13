@@ -25,8 +25,12 @@
 #include "libmpeg2.h"
 #include "MpcDvdVideoDecoder.h"
 
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <xmmintrin.h>
 #include <emmintrin.h>
+#endif
 
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/GolombBuffer.h"

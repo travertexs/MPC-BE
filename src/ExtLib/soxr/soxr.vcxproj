@@ -17,23 +17,27 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cr.c" />
     <ClCompile Include="cr32.c" />
-    <ClCompile Include="cr32s.c" />
+    <ClCompile Include="cr32s.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="cr64.c" />
-    <ClCompile Include="cr64s.c" />
+    <ClCompile Include="cr64s.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="data-io.c" />
     <ClCompile Include="dbesi0.c" />
     <ClCompile Include="fft4g32.c" />
     <ClCompile Include="fft4g64.c" />
     <ClCompile Include="filter.c" />
-    <ClCompile Include="pffft32s.c" />
-    <ClCompile Include="pffft64s.c" />
+    <ClCompile Include="pffft32s.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="pffft64s.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="soxr.c" />
-    <ClCompile Include="util32s.c" />
-    <ClCompile Include="util64s.c" />
+    <ClCompile Include="util32s.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="util64s.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="vr32.c" />
   </ItemGroup>
   <ItemGroup>

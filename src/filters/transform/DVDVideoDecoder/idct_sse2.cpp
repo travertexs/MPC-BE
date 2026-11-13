@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include "libmpeg2.h"
 #include "attributes.h"
 #include "simd.h"

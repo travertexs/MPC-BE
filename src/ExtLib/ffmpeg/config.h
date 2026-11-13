@@ -2,7 +2,7 @@
 #define FFMPEG_CONFIG_H
 
 #define SWS_MAX_FILTER_SIZE 256
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__aarch64__)
 	#define HAVE_INLINE_ASM 1
 
 	#define HAVE_MMX 1
@@ -137,6 +137,12 @@
 	#define HAVE_XMM_CLOBBERS 0
 	#define CONFIG_PIC 0
 
+	#if defined(__aarch64__) || defined(_M_ARM64)
+	/* The vendored tree contains portable C DSP and x86 backends. */
+	#define ARCH_X86 0
+	#define ARCH_X86_32 0
+	#define ARCH_X86_64 0
+	#else
 	#define ARCH_X86 1
 	#ifdef _WIN64
 		#define ARCH_X86_32 0
@@ -146,8 +152,11 @@
 		#define ARCH_X86_64 0
 	#endif
 
+	#endif
+#ifndef __GNUC__
 	#define av_restrict
 	#define __asm__ __asm
+#endif
 #endif
 
 // Use DPRINTF instead of av_log. To be used for debug purpose because DPRINTF will be always called (the
@@ -163,7 +172,7 @@
 #define ASMALIGN(ZEROBITS) ".p2align " #ZEROBITS "\n\t"
 
 // MPC custom code for linking with MSVC
-#if defined(__GNUC__) && ARCH_X86_64
+#if defined(__aarch64__) || (defined(__GNUC__) && ARCH_X86_64)
 	#define EXTERN_PREFIX ""
 	#define EXTERN_ASM
 #else

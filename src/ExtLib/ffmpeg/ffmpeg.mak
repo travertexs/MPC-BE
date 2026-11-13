@@ -5,7 +5,9 @@ FFNVCODEC_DIR = ../nv-codec-headers/include
 UAVS3D_DIR    = ../uavs3d/source/decoder
 VVDEC_DIR     = ../vvdec/vvdec/include
 
-ifeq ($(64BIT),yes)
+ifeq ($(ARM64),yes)
+	PLATFORM = ARM64
+else ifeq ($(64BIT),yes)
 	PLATFORM = x64
 else
 	PLATFORM = Win32
@@ -39,7 +41,11 @@ CFLAGS = -I. -Icompat/atomics/win32 -Icompat/windows \
 
 NASMFLAGS = -I. -Pconfig.asm
 
-ifeq ($(64BIT),yes)
+ifeq ($(ARM64),yes)
+	GCC_PREFIX = aarch64-w64-mingw32-
+	CFLAGS += $(ARM64_INCLUDES) -DWIN64 -D_WIN64 -DPIC -D__USE_MINGW_ANSI_STDIO=0 -Wno-unknown-warning-option
+	OPTFLAGS =
+else ifeq ($(64BIT),yes)
 	GCC_PREFIX  = x86_64-w64-mingw32-
 	TARGET_OS   = x86_64-w64-mingw32
 	CFLAGS     += -DWIN64 -D_WIN64 -DARCH_X86_64 -DPIC
@@ -991,6 +997,13 @@ SRCS_ASM_LS += \
 	libswscale/x86/ops_float.asm \
 	libswscale/x86/ops_include.asm \
 	libswscale/x86/ops_int.asm
+endif
+
+ifeq ($(ARM64),yes)
+  # The x86 backends are interleaved with portable C in the source lists.
+  strip_x86 = $(foreach file,$(1),$(if $(findstring /x86/,$(file)),,$(file)))
+  $(foreach group,LC LC_B LC_BSF LF LU LR LS,$(eval SRCS_$(group) := $(call strip_x86,$(SRCS_$(group)))))
+  $(foreach group,LC LF LU LR LS,$(eval SRCS_ASM_$(group) :=))
 endif
 
 OBJS_LC = \
