@@ -102,7 +102,15 @@ static void DumpStackTrace(HMODULE hDbhHelp, LPCWSTR lpFileName, _EXCEPTION_POIN
 	STACKFRAME64 frame = {};
 	DWORD imageType = 0;
 
-#ifdef _M_X64
+#if defined(_M_ARM64)
+	imageType = IMAGE_FILE_MACHINE_ARM64;
+	frame.AddrPC.Offset = ctx->Pc;
+	frame.AddrPC.Mode = AddrModeFlat;
+	frame.AddrFrame.Offset = ctx->Fp;
+	frame.AddrFrame.Mode = AddrModeFlat;
+	frame.AddrStack.Offset = ctx->Sp;
+	frame.AddrStack.Mode = AddrModeFlat;
+#elif defined(_M_X64)
 	imageType = IMAGE_FILE_MACHINE_AMD64;
 	frame.AddrPC.Offset = ctx->Rip;
 	frame.AddrPC.Mode = AddrModeFlat;

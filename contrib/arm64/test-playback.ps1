@@ -1,11 +1,16 @@
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path player/mpc-be-arm64.exe).Path
-$b = [IO.File]::ReadAllBytes($exe)
-$pe = [BitConverter]::ToInt32($b, 0x3c)
-if ([BitConverter]::ToUInt32($b, $pe) -ne 0x4550 -or [BitConverter]::ToUInt16($b, $pe+4) -ne 0xaa64) {
-    throw 'Player must be an ARM64 PE image'
+$images = @(Get-Item $exe) + @(Get-ChildItem player -Recurse -Filter *.dll)
+if ($images.Count -lt 3) { throw 'Player resource DLLs are missing' }
+foreach ($file in $images) {
+    $b = [IO.File]::ReadAllBytes($file.FullName)
+    $pe = [BitConverter]::ToInt32($b, 0x3c)
+    if ([BitConverter]::ToUInt32($b, $pe) -ne 0x4550 -or [BitConverter]::ToUInt16($b, $pe+4) -ne 0xaa64) {
+        throw "$($file.Name) must be an ARM64 PE image"
+    }
 }
+Write-Host "Verified ARM64 PE headers in all $($images.Count) packaged images."
 # The uncompressed null renderer exercises decoding without requiring a VM sound device.
 $ini = [IO.Path]::ChangeExtension($exe, '.ini')
 $settings = @"
