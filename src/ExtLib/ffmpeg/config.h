@@ -517,7 +517,7 @@
 #define CONFIG_VULKAN 0
 #define CONFIG_ICONV 0
 #define CONFIG_JNI 0
-#define HAVE_X86ASM 1
+#define HAVE_X86ASM ARCH_X86
 
 #define HAVE_EXP2 1
 #define HAVE_EXP2F 1
