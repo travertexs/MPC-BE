@@ -30,13 +30,6 @@ EOF
 meson setup dav1d-build dav1d --cross-file windows-arm64.ini --buildtype release --default-library static -Denable_tools=false -Denable_tests=false --prefix="$tmp/deps"
 meson install -C dav1d-build
 cp "$(find "$tmp/deps" -name libdav1d.a -print -quit)" "$out/"
-git clone -q --depth 1 --branch v2.0.3 https://github.com/mstorsjo/fdk-aac.git
-cmake -S fdk-aac -B fdk-build -G Ninja -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=ARM64 \
-  -DCMAKE_C_COMPILER=$target-clang -DCMAKE_CXX_COMPILER=$target-clang++ -DCMAKE_RC_COMPILER=$target-windres \
-  -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX="$tmp/deps"
-cmake --build fdk-build
-cmake --install fdk-build
-cp "$(find "$tmp/deps" -name libfdk-aac.a -print -quit)" "$out/fdk-aac.lib"
 cp "$($target-clang -print-file-name=libmingwex.a)" "$out/"
 cp "$($target-clang -print-libgcc-file-name)" "$out/libbuiltins.a"
 # Prepend installed public headers so the structures match the linked libraries.
