@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <deque>
+
 #include "Misc.h"
 #include "PlayerChildView.h"
 #include "PlayerPreView.h"

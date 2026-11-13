@@ -67,7 +67,7 @@ jobs:
           call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -host_arch=x64
           call update_revision.cmd
           msbuild src\apps\mplayerc\mpc-be.vcxproj /m:3 /p:Configuration=Release /p:Platform=ARM64 /p:SolutionDir=%CD%\ /p:CL_MPCount=2 /p:BuildProjectReferences=true /v:minimal /fl "/flp:logfile=arm64-build.log;verbosity=normal"
-      - name: Build icon and language libraries
+      - name: Build shell extension, icon and language libraries
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
@@ -75,13 +75,16 @@ jobs:
           $root = "$pwd\"
           & $msbuild src/apps/mpciconlib/mpciconlib.vcxproj /p:Configuration=Release /p:Platform=ARM64 "/p:SolutionDir=$root" /v:quiet
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & $msbuild src/apps/MPCBEShellExt/MPCBEShellExt.vcxproj /p:Configuration=Release /p:Platform=ARM64 "/p:SolutionDir=$root" /v:quiet
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $project = 'src/apps/mpcresources/mpcresources.vcxproj'
           $configs = ([xml](Get-Content $project -Raw)).Project.ItemGroup.ProjectConfiguration | Where-Object Platform -eq ARM64
           foreach ($config in $configs) {
             & $msbuild $project "/p:Configuration=$($config.Configuration)" /p:Platform=ARM64 "/p:SolutionDir=$root" /v:quiet
             if ($LASTEXITCODE) { exit $LASTEXITCODE }
           }
-          Copy-Item LICENSE.txt _bin/mpc-be_ARM64/
+          Copy-Item LICENSE.txt,docs/Authors*.txt _bin/mpc-be_ARM64/
+          Copy-Item distrib/Shaders,distrib/Shaders11 _bin/mpc-be_ARM64/ -Recurse
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -94,7 +97,10 @@ jobs:
             _bin/mpc-be_ARM64/mpc-be-arm64.exe
             _bin/mpc-be_ARM64/mpciconlib.dll
             _bin/mpc-be_ARM64/Lang/*.dll
-            _bin/mpc-be_ARM64/LICENSE.txt
+            _bin/mpc-be_ARM64/MPCBEShellExt64.dll
+            _bin/mpc-be_ARM64/*.txt
+            _bin/mpc-be_ARM64/Shaders/
+            _bin/mpc-be_ARM64/Shaders11/
           if-no-files-found: error
   playback:
     needs: player
