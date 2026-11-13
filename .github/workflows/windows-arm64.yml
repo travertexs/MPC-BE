@@ -1,0 +1,79 @@
+name: Windows ARM64
+on:
+  push:
+    branches: [windows-arm64]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: arm64-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  codecs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: git submodule update --init --depth 1 src/ExtLib/nv-codec-headers src/ExtLib/vvdec/vvdec
+      - uses: actions/cache@v4
+        id: cache
+        with:
+          path: libarm64
+          key: codecs-arm64-v1-${{ hashFiles('contrib/arm64/codecs.sh', 'src/ExtLib/ffmpeg/**', 'src/ExtLib/vvdec/vvdec.h') }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y meson ninja-build
+          bash contrib/arm64/codecs.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arm64-codecs
+          path: libarm64/
+          if-no-files-found: error
+  player:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch source dependencies
+        run: |
+          git submodule update --init --depth 1 -- src/ExtLib
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Invoke-WebRequest https://raw.githubusercontent.com/DLTcollab/sse2neon/2272251cc3ad9cba8b8c47c4065811cfb396b802/sse2neon.h -OutFile include/sse2neon.h
+      - name: Fetch native codec archives
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: arm64-codecs
+          path: libarm64
+      - name: Compile player projects for ARM64
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -host_arch=x64
+          call update_revision.cmd
+          msbuild src\apps\mplayerc\mpc-be.vcxproj /m:3 /p:Configuration=Release /p:Platform=ARM64 /p:SolutionDir=%CD%\ /p:CL_MPCount=2 /p:BuildProjectReferences=true /v:minimal /fl "/flp:logfile=arm64-build.log;verbosity=normal"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: player-build-log
+          path: arm64-build.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MPC-BE-Windows-ARM64
+          path: _bin/mpc-be_ARM64/mpc-be-arm64.exe
+          if-no-files-found: error
+  playback:
+    needs: player
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: MPC-BE-Windows-ARM64
+          path: player
+      - run: ./contrib/arm64/test-playback.ps1

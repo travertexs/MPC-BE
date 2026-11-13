@@ -19,6 +19,9 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include <MMReg.h>
 #include "AudioHelper.h"
 

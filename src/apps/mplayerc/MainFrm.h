@@ -67,7 +67,9 @@
 #include <evr9.h>
 #include <Il21dec.h>
 #include "OSD.h"
+#ifndef _M_ARM64
 #include "LcdSupport.h"
+#endif
 #include "MpcApi.h"
 #include "filters/renderer/SyncClock/SyncClock.h"
 #include "filters/transform/DecSSFilter/IfoFile.h"
@@ -940,7 +942,9 @@ private:
 	void cmdLineThreadFunction();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
+#ifndef _M_ARM64
 	CMPC_Lcd m_Lcd;
+#endif
 
 	LRESULT OnRestore(WPARAM wParam, LPARAM lParam);
 

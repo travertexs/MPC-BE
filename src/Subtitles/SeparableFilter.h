@@ -23,6 +23,9 @@
 
 #define LIBDIVIDE_SSE2 1
 #include "libdivide.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 
 /*
 // Filter an image in horizontal direction with a one-dimensional filter

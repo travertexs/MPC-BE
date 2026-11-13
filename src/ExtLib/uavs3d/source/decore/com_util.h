@@ -36,7 +36,9 @@
 #include "com_type.h"
 
 /* function selection define based on platforms */
-#if defined(_arm64) || (defined(__APPLE__) && defined(__arm64__))
+#if defined(_M_ARM64)
+#define ENABLE_FUNCTION_C 1
+#elif defined(_arm64) || (defined(__APPLE__) && defined(__arm64__))
 #define ENABLE_FUNCTION_C 1
 #define ENABLE_FUNCTION_ARM64 1
 #elif defined(_armv7a) || (defined(__APPLE__) && defined(__ARM_NEON__))

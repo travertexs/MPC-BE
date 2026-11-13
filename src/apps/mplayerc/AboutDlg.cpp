@@ -47,7 +47,9 @@ BOOL CAboutDlg::OnInitDialog()
 
 	__super::OnInitDialog();
 
-#ifdef _WIN64
+#if defined(_M_ARM64)
+	m_appname += L" (ARM64)";
+#elif defined(_WIN64)
 	m_appname += L" (64-bit)";
 #endif
 

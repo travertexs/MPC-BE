@@ -21,6 +21,9 @@
 #pragma once
 
 #include "pixconv_sse2_templates.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 
 //
 // from LAVFilters/decoder/LAVVideo/pixconv/yuv2yuv_unscaled.cpp

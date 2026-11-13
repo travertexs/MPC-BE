@@ -21,6 +21,9 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include "FormatConverter.h"
 #include "pixconv_internal.h"
 #include "DSUtil/pixconv/pixconv_sse2_templates.h"

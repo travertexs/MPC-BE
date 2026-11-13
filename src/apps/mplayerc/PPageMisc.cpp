@@ -74,6 +74,9 @@ END_MESSAGE_MAP()
 BOOL CPPageMisc::OnInitDialog()
 {
 	__super::OnInitDialog();
+#ifdef _M_ARM64
+	GetDlgItem(IDC_CHECK_LCD)->EnableWindow(FALSE);
+#endif
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 

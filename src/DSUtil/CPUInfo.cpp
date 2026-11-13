@@ -41,6 +41,9 @@ static int nCPUType = CPUInfo::PROCESSOR_UNKNOWN;
 
 static int GetCPUFeatures()
 {
+#ifdef _M_ARM64
+	return 0; // No x86 instruction-set features on ARM64.
+#else
 	unsigned nHighestFeature   = 0;
 	unsigned nHighestFeatureEx = 0;
 	int      nCPUFeatures      = 0;
@@ -95,6 +98,7 @@ static int GetCPUFeatures()
 	}
 
 	return nCPUFeatures;
+#endif
 }
 static const int  nCPUFeatures = GetCPUFeatures();
 static const bool bSSSE3       = !!(nCPUFeatures & CPUInfo::CPU_SSSE3);

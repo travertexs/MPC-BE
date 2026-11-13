@@ -655,7 +655,9 @@ CMainFrame::CMainFrame() :
 	m_abRepeatPositionAEnabled(false),
 	m_abRepeatPositionBEnabled(false)
 {
+#ifndef _M_ARM64
 	m_Lcd.SetVolumeRange(0, 100);
+#endif
 
 	// Remove the lines-splitters between bars
 	afxData.cyBorder2 = 0;
@@ -862,7 +864,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
 	SetWindowTextW(s_strPlayerTitle);
+#ifndef _M_ARM64
 	m_Lcd.SetMediaTitle(s_strPlayerTitle);
+#endif
 
 	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
 
@@ -2627,8 +2631,12 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				m_wndSeekBar.SetRange(rtDur);
 				m_wndSeekBar.SetPos(rtNow);
 				m_OSD.SetPosAndRange(rtNow, rtDur);
+#ifndef _M_ARM64
 				m_Lcd.SetMediaRange(0, rtDur);
+#endif
+#ifndef _M_ARM64
 				m_Lcd.SetMediaPos(rtNow);
+#endif
 
 				if (m_pCAP) {
 					if (g_bExternalSubtitleTime) {
@@ -4875,7 +4883,9 @@ void CMainFrame::OnFilePostCloseMedia()
 	UpdateWindow();
 
 	SetWindowTextW(s_strPlayerTitle);
+#ifndef _M_ARM64
 	m_Lcd.SetMediaTitle(s_strPlayerTitle);
+#endif
 
 	SetAlwaysOnTop(s.iOnTop);
 
@@ -8281,7 +8291,9 @@ void CMainFrame::OnPlayPlay()
 	}
 
 	MoveVideoWindow(false, true);
+#ifndef _M_ARM64
 	m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PLAYING), 3000);
+#endif
 	SetPlayState(PS_PLAY);
 
 	OnTimer(TIMER_STREAMPOSPOLLER);
@@ -8388,7 +8400,9 @@ void CMainFrame::OnPlayPause()
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+#ifndef _M_ARM64
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_PAUSED), 3000);
+#endif
 	}
 
 	SetPlayState(PS_PAUSE);
@@ -8487,7 +8501,9 @@ void CMainFrame::OnPlayStop()
 			strOSD.Delete(i, strOSD.GetLength() - i);
 		}
 		m_OSD.DisplayMessage(OSD_TOPLEFT, strOSD, 3000);
+#ifndef _M_ARM64
 		m_Lcd.SetStatusMessage(ResStr(IDS_CONTROLS_STOPPED), 3000);
+#endif
 	}
 
 	DisableABRepeat();
@@ -9377,7 +9393,9 @@ void CMainFrame::OnPlayVolume(UINT nID)
 	}
 
 	m_OSD.DisplayMessage(OSD_TOPLEFT, strVolume, 3000);
+#ifndef _M_ARM64
 	m_Lcd.SetVolume((m_wndToolBar.Volume > -10000 ? m_wndToolBar.m_volctrl.GetPos() : 1));
+#endif
 }
 
 void CMainFrame::OnPlayVolumeGain(UINT nID)
@@ -13586,7 +13604,9 @@ void CMainFrame::UpdateWindowTitle()
 	const int style = AfxGetAppSettings().iTitleBarTextStyle;
 	CString title = GetTextForBar(style);
 
+#ifndef _M_ARM64
 	m_Lcd.SetMediaTitle(title);
+#endif
 
 	if (style == TEXTBAR_EMPTY) {
 		title = s_strPlayerTitle;
@@ -17779,7 +17799,9 @@ void CMainFrame::SendStatusMessage(const CString& msg, const int nTimeOut)
 
 	m_playingmsg = msg;
 	SetTimer(TIMER_STATUSERASER, nTimeOut, nullptr);
+#ifndef _M_ARM64
 	m_Lcd.SetStatusMessage(msg, nTimeOut);
+#endif
 }
 
 void CMainFrame::SendStatusCompactPath(const CString& path)
@@ -18111,7 +18133,9 @@ void CMainFrame::SetLoadState(MPC_LOADSTATE iState)
 
 void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 {
+#ifndef _M_ARM64
 	m_Lcd.SetPlayState((CMPC_Lcd::PlayState)iState);
+#endif
 	SendAPICommand(CMD_PLAYMODE, L"%d", iState);
 
 	if (m_bEndOfStream) {

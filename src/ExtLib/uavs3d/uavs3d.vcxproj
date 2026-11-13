@@ -17,6 +17,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\decoder\bitstream.c" />
@@ -24,13 +28,13 @@
     <ClCompile Include="source\decoder\parser.c" />
     <ClCompile Include="source\decoder\uavs3d.c" />
     <ClCompile Include="source\decore\alf.c" />
-    <ClCompile Include="source\decore\avx2\alf_avx2.c" />
-    <ClCompile Include="source\decore\avx2\avx2.c" />
-    <ClCompile Include="source\decore\avx2\inter_pred_avx2.c" />
-    <ClCompile Include="source\decore\avx2\intra_pred_avx2.c" />
-    <ClCompile Include="source\decore\avx2\itrans_avx2.c" />
-    <ClCompile Include="source\decore\avx2\pixel_avx2.c" />
-    <ClCompile Include="source\decore\avx2\sao_avx2.c" />
+    <ClCompile Include="source\decore\avx2\alf_avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\inter_pred_avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\intra_pred_avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\itrans_avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\pixel_avx2.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\avx2\sao_avx2.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="source\decore\com_table.c" />
     <ClCompile Include="source\decore\com_util.c" />
     <ClCompile Include="source\decore\deblock.c" />
@@ -40,14 +44,14 @@
     <ClCompile Include="source\decore\pic_manager.c" />
     <ClCompile Include="source\decore\recon.c" />
     <ClCompile Include="source\decore\sao.c" />
-    <ClCompile Include="source\decore\sse\alf_sse.c" />
-    <ClCompile Include="source\decore\sse\deblock_sse.c" />
-    <ClCompile Include="source\decore\sse\inter_pred_sse.c" />
-    <ClCompile Include="source\decore\sse\intra_pred_sse.c" />
-    <ClCompile Include="source\decore\sse\itrans_sse.c" />
-    <ClCompile Include="source\decore\sse\pixel_sse.c" />
-    <ClCompile Include="source\decore\sse\sao_sse.c" />
-    <ClCompile Include="source\decore\sse\sse.c" />
+    <ClCompile Include="source\decore\sse\alf_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\deblock_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\inter_pred_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\intra_pred_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\itrans_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\pixel_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\sao_sse.c" Condition="'$(Platform)'!='ARM64'" />
+    <ClCompile Include="source\decore\sse\sse.c" Condition="'$(Platform)'!='ARM64'" />
     <ClCompile Include="source\decore\threadpool.c" />
     <ClCompile Include="source\decore\win32thread.c" />
   </ItemGroup>

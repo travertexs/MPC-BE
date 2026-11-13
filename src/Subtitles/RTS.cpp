@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#endif
 #include <intrin.h>
 #include "RTS.h"
 #include <moreuuids.h>
@@ -423,15 +426,18 @@ void CWord::Transform(const CPoint &org ) // Transform_SSE2
 		__m128i __pointxRounded = _mm_cvtps_epi32(__pointx);
 		__m128i __pointyRounded = _mm_cvtps_epi32(__pointy);
 
+		alignas(16) int roundedX[4], roundedY[4];
+		_mm_store_si128(reinterpret_cast<__m128i*>(roundedX), __pointxRounded);
+		_mm_store_si128(reinterpret_cast<__m128i*>(roundedY), __pointyRounded);
 		if (i == mPathPointsD4) { // last cycle
 			for (int k = 0; k < mPathPointsM4; k++) {
-				mpPathPoints[i * 4 + k].x = __pointxRounded.m128i_i32[3 - k];
-				mpPathPoints[i * 4 + k].y = __pointyRounded.m128i_i32[3 - k];
+				mpPathPoints[i * 4 + k].x = roundedX[3 - k];
+				mpPathPoints[i * 4 + k].y = roundedY[3 - k];
 			}
 		} else {
 			for (int k = 0; k < 4; k++) {
-				mpPathPoints[i * 4 + k].x = __pointxRounded.m128i_i32[3 - k];
-				mpPathPoints[i * 4 + k].y = __pointyRounded.m128i_i32[3 - k];
+				mpPathPoints[i * 4 + k].x = roundedX[3 - k];
+				mpPathPoints[i * 4 + k].y = roundedY[3 - k];
 			}
 		}
 	}

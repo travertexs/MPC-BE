@@ -44,6 +44,12 @@
       <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Filter|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)src\ExtLib\ffmpeg;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -129,7 +135,7 @@
     <ProjectReference Include="$(SolutionDir)src\filters\parser\BaseSplitter\BaseSplitter.vcxproj">
       <Project>{37768b3f-89bc-4c16-b2a8-767c5da84c3f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg.vcxproj">
+    <ProjectReference Include="..\..\..\ExtLib\ffmpeg\ffmpeg.vcxproj" Condition="'$(Platform)'!='ARM64'">
       <Project>{438286b7-a9f4-411d-bcc5-948c40e37d8f}</Project>
     </ProjectReference>
   </ItemGroup>

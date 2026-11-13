@@ -56,7 +56,13 @@ static char g_libavcodec_Version[31];
 
 char* GetFFmpegCompiler()
 {
-	snprintf(g_Gcc_Compiler, sizeof(g_Gcc_Compiler), "GCC %d.%d.%d%s%s", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__, COMPILER, COMPILER_SSE);
+	snprintf(g_Gcc_Compiler, sizeof(g_Gcc_Compiler), 
+#ifdef __clang__
+		"Clang %d.%d.%d%s%s", __clang_major__, __clang_minor__, __clang_patchlevel__
+#else
+		"GCC %d.%d.%d%s%s", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__
+#endif
+		, COMPILER, COMPILER_SSE);
 	return g_Gcc_Compiler;
 }
 
