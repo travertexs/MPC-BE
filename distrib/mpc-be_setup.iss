@@ -682,9 +682,10 @@ end;
 function MsiQueryProductState(Product: String): Integer;
 external 'MsiQueryProductStateW@msi.dll stdcall';
 
-function PrepareToInstall(var NeedsRestart: Boolean): String;
 const
   LegacyProduct = '{3C9B7952-98AC-4240-B0F1-825776ECC782}';
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   Status: Integer;
 begin
