@@ -126,18 +126,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: MPC-BE-Windows-ARM64
-          path: payload
-      - name: Package native ARM64 Windows Installer
-        shell: pwsh
-        run: |
-          dotnet tool install wix --version 5.0.2 --tool-path "$env:RUNNER_TEMP/wix"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & "$env:RUNNER_TEMP/wix/wix.exe" build distrib/mpc-be-arm64.wxs -arch arm64 -d "Version=$env:RELEASE_VERSION" -bindpath "payload=$PWD/payload" -o "installer/MPC-BE.$env:RELEASE_VERSION.arm64.msi"
-          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          path: _bin/mpc-be_ARM64
+      - name: Compile the upstream interactive setup for Windows on Arm
+        run: ./contrib/arm64/package-setup.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: MPC-BE-ARM64-installer
-          path: installer/*.msi
+          path: installer/*.exe
           if-no-files-found: error
   playback:
     needs: installer
@@ -160,5 +155,14 @@ jobs:
           path: codec-check
       - name: Verify FFmpeg NEON dispatch and calculations
         run: ./codec-check/ffmpeg-dsp-check.exe
-      - name: Install, verify version, play media and uninstall
+      - name: Download previous MSI as an upgrade fixture
+        run: |
+          New-Item legacy -ItemType Directory | Out-Null
+          Invoke-WebRequest 'https://github.com/travertexs/MPC-BE/releases/download/1.9.3-arm64/MPC-BE.1.9.3.arm64.msi' -OutFile legacy/previous.msi
+      - name: Drive the wizard and verify the x64 and MSI upgrade
         run: ./contrib/arm64/test-install.ps1 -Version $env:RELEASE_VERSION
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: setup-test-logs
+          path: '*.log'

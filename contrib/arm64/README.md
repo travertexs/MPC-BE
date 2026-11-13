@@ -2,6 +2,10 @@
 
 The `windows-arm64` branch builds the upstream MFC player, DirectShow filters and resources for the ARM64 ABI. Extract the entire portable package into one folder and launch `mpc-be-arm64.exe`. The English UI is embedded in the player. The other upstream languages are in the `Lang` folder.
 
+## Windows installer
+
+Open the release EXE for MPC-BE's interactive Inno Setup wizard. Windows lists the player as **MPC-BE arm64 1.9.3**. Setup reuses the upstream 64-bit installer's AppId, registry view, install folder, settings and executable name (`mpc-be64.exe`). An existing upstream x64 installation upgrades in place. Setup removes the previously published 1.9.3 ARM64 MSI after you confirm installation. The Intel MVC runtime and the upstream x86/x64-only external DirectShow filters are omitted from the component list.
+
 ## Build and runtime checks
 
 The Windows ARM64 workflow cross-compiles the vendored FFmpeg source on Ubuntu with LLVM-MinGW targeting Windows UCRT. Visual Studio 2022 on a Windows runner compiles the player, filters and resource DLLs for ARM64 and links the native codec archives. The playback job downloads the same package on a GitHub-hosted Windows 11 Arm machine. It checks the PE machine fields and uses MPC-BE's web interface on loopback to confirm the file name, media duration and advancing playback position. The fixtures contain FLAC audio, H.264 in MP4 and AV1 in Matroska. The uncompressed null renderers let the test exercise decoding without requiring physical speakers or a GPU display.

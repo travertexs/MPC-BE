@@ -48,6 +48,11 @@
 
 #define bin_dir        = "..\_bin"
 
+#ifdef Arm64Build
+  #define arch_label "arm64"
+#else
+  #define arch_label "x64"
+#endif
 #define bindir_x64 = bin_dir + "\mpc-be_x64"
 #define bindir_x86 = bin_dir + "\mpc-be_x86"
 
@@ -60,12 +65,16 @@
   #define Description  = app_name + " " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be.VisualElementsManifest.xml"
 #else
-  #define bindir       = bin_dir + "\mpc-be_x64"
+  #ifdef Arm64Build
+    #define bindir     = bin_dir + "\mpc-be_ARM64"
+  #else
+    #define bindir     = bindir_x64
+  #endif
   #define mpcbe_exe    = "mpc-be64.exe"
   #define mpcbe_ini    = "mpc-be64.ini"
   #define dxdir        = "MPC_components\DirectX\x64"
-  #define BeveledLabel = app_name + " x64 " + app_version
-  #define Description  = app_name + " x64 " + app_version
+  #define BeveledLabel = app_name + " " + arch_label + " " + app_version
+  #define Description  = app_name + " " + arch_label + " " + app_version
   #define VisualElementsManifest = "VisualElements\mpc-be64.VisualElementsManifest.xml"
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.11.1"
@@ -85,14 +94,19 @@ VersionInfoProductName={#app_name}
 #else
 AppId={{FE09AF6D-78B2-4093-B012-FCDAF78693CE}
 DefaultGroupName={#app_name} x64
-OutputBaseFilename={#app_name}.{#app_version}.x64
-UninstallDisplayName={#app_name} x64 {#app_version}
+OutputBaseFilename={#app_name}.{#app_version}.{#arch_label}
+UninstallDisplayName={#app_name} {#arch_label} {#app_version}
+#ifdef Arm64Build
+ArchitecturesAllowed=arm64
+ArchitecturesInstallIn64BitMode=arm64
+#else
 ArchitecturesAllowed=x64 arm64
 ArchitecturesInstallIn64BitMode=x64 arm64
-AppName={#app_name} x64
-AppVerName={#app_name} x64 {#app_version}
-VersionInfoDescription={#app_name} x64 Setup
-VersionInfoProductName={#app_name} x64
+#endif
+AppName={#app_name} {#arch_label}
+AppVerName={#app_name} {#arch_label} {#app_version}
+VersionInfoDescription={#app_name} {#arch_label} Setup
+VersionInfoProductName={#app_name} {#arch_label}
 #endif
 AppVersion={#app_version}
 AppPublisher={#app_name} Team
@@ -213,10 +227,13 @@ Name: "mpciconlib";    Description: "{cm:comp_mpciconlib}";     Types: default c
 Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default custom; Flags: disablenouninstallwarning
 #endif
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
+#ifndef Arm64Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: default custom; Flags: disablenouninstallwarning;
 Name: "mpcscriptsrc";  Description: "{#mpcscriptsrc_desc}";     Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcimagesrc";   Description: "{#mpcimagesrc_desc}";      Types: custom;         Flags: disablenouninstallwarning;
+
+#endif
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -231,10 +248,14 @@ Name: reset_settings;           Description: {cm:tsk_ResetSettings};     GroupDe
 [Files]
 Source: "{#bindir}\{#mpcbe_exe}";            DestDir: "{app}"; Flags: ignoreversion;                                   Components: main
 Source: "{#bindir}\mpciconlib.dll";          DestDir: "{app}"; Flags: ignoreversion;                                   Components: mpciconlib
+#ifdef Arm64Build
+Source: "{#bindir}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver 64bit; Components: mpcbeshellext
+#else
 Source: "{#dxdir}\d3dcompiler_47.dll";       DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check: not D3DCompiler_47_DLLExists();
 Source: "{#dxdir}\d3dx9_43.dll";             DestDir: "{app}"; Flags: ignoreversion;                                   Components: main;          Check: not D3DX9_43_DLLExists();
 Source: "{#bindir_x64}\MPCBEShellExt64.dll"; DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext; Check: IsWin64
 Source: "{#bindir_x86}\MPCBEShellExt.dll";   DestDir: "{app}"; Flags: ignoreversion restartreplace uninsrestartdelete regserver noregerror; Components: mpcbeshellext;
+#endif
 #ifdef localize
 Source: "{#bindir}\Lang\mpcresources.??.dll";             DestDir: "{app}\Lang"; Flags: ignoreversion; Components: mpcresources
 #endif
@@ -250,6 +271,7 @@ Source: "Shaders11\*.hlsl";                DestDir: "{commonappdata}\{#app_name}
 Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";                   Flags: ignoreversion; Components: main; Check: IniUsed()
 Source: "VisualElements\*.png";            DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
+#ifndef Arm64Build
 #ifdef Win32Build
 Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;
@@ -262,6 +284,7 @@ Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer64.ax"; DestDir: "{app}
 Source: "MPC_components\MpcScriptSource\MpcScriptSource64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcscriptsrc;
 Source: "MPC_components\MpcImageSource\MpcImageSource64.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcimagesrc;
 #endif
+#endif
 
 [Icons]
 #ifdef Win32Build
@@ -270,10 +293,10 @@ Name: {commondesktop}\{#app_name};                   Filename: {app}\{#mpcbe_exe
 Name: {userdesktop}\{#app_name};                     Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
 Name: {group}\{cm:UninstallProgram,{#app_name}};     Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name}};     WorkingDir: {app}
 #else
-Name: {group}\{#app_name} x64;                       Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
-Name: {commondesktop}\{#app_name} x64;               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
-Name: {userdesktop}\{#app_name} x64;                 Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} x64;        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
-Name: {group}\{cm:UninstallProgram,{#app_name} x64}; Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name} x64}; WorkingDir: {app}
+Name: {group}\{#app_name} {#arch_label};                       Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} {#arch_label};        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
+Name: {commondesktop}\{#app_name} {#arch_label};               Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} {#arch_label};        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
+Name: {userdesktop}\{#app_name} {#arch_label};                 Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version} {#arch_label};        WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\user
+Name: {group}\{cm:UninstallProgram,{#app_name} {#arch_label}}; Filename: {uninstallexe};          Comment: {cm:UninstallProgram,{#app_name} {#arch_label}}; WorkingDir: {app}
 #endif
 Name: {group}\Changelog;                             Filename: {app}\Changelog.txt;     Comment: {cm:ViewChangelog};                    WorkingDir: {app}
 Name: {group}\ChangelogRus;                          Filename: {app}\Changelog.Rus.txt; Comment: {cm:ViewChangelog};                    WorkingDir: {app}
@@ -285,6 +308,22 @@ Filename: "{app}\Changelog.txt";     WorkingDir: "{app}"; Flags: nowait postinst
 Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Languages: ru
 
 [InstallDelete]
+#ifdef Arm64Build
+; Replace the shortcut labels on existing upstream 64-bit installs.
+Type: files; Name: "{group}\{#app_name} x64.lnk"; Check: IsUpgrade()
+Type: files; Name: "{group}\{cm:UninstallProgram,{#app_name} x64}.lnk"; Check: IsUpgrade()
+Type: files; Name: "{userdesktop}\{#app_name} x64.lnk"; Check: IsUpgrade()
+Type: files; Name: "{commondesktop}\{#app_name} x64.lnk"; Check: IsUpgrade()
+; Retire only the named optional files shipped by the previous upstream installer.
+Type: files; Name: "{app}\Filters\MpcVideoRenderer64.ax"; Check: IsUpgrade(); BeforeInstall: UnregisterOldFilter('MpcVideoRenderer64.ax')
+Type: files; Name: "{app}\Filters\MpcScriptSource64.ax"; Check: IsUpgrade(); BeforeInstall: UnregisterOldFilter('MpcScriptSource64.ax')
+Type: files; Name: "{app}\Filters\MpcImageSource64.ax"; Check: IsUpgrade(); BeforeInstall: UnregisterOldFilter('MpcImageSource64.ax')
+Type: files; Name: "{app}\libmfxsw64.dll"; Check: IsUpgrade()
+Type: files; Name: "{app}\MPCBEShellExt64.dll"; Check: IsUpgrade() and not WizardIsComponentSelected('mpcbeshellext')
+; The old app-local x64 DirectX redistributables would shadow the Windows Arm DLLs.
+Type: files; Name: "{app}\d3dcompiler_47.dll"; Check: IsUpgrade()
+Type: files; Name: "{app}\d3dx9_43.dll"; Check: IsUpgrade()
+#endif
 Type: files; Name: "{userdesktop}\{#app_name}.lnk";   Check: not WizardIsTaskSelected('desktopicon\user')   and IsUpgrade()
 Type: files; Name: "{commondesktop}\{#app_name}.lnk"; Check: not WizardIsTaskSelected('desktopicon\common') and IsUpgrade()
 Type: files; Name: "{app}\AUTHORS";                   Check: IsUpgrade()
@@ -307,6 +346,10 @@ Type: files; Name: "{app}\mpcresources.??.dll"
 ;Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Registry]
+#ifdef Arm64Build
+Root: HKLM; Subkey: "SOFTWARE\MPC-BE.ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletevalue; Components: mpcbeshellext
+Root: HKCU; Subkey: "Software\MPC-BE.ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletevalue; Components: mpcbeshellext
+#endif
 Root: HKLM; Subkey: "SOFTWARE\Clients\Media\MPC-BE"; Flags: dontcreatekey uninsdeletekey
 Root: HKLM; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{#mpcbe_exe}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#mpcbe_exe}"; Flags: deletekey uninsdeletekey
 
@@ -614,13 +657,49 @@ begin
     Result := True;
     CreateMutex(installer_mutex);
 
+    #ifndef Arm64Build
     if not Is_SSE2_Supported() then
     begin
       SuppressibleMsgBox(CustomMessage('msg_simd_sse2'), mbCriticalError, MB_OK, MB_OK);
       Result := False;
     end;
+    #endif
   end;
 end;
+
+#ifdef Arm64Build
+procedure UnregisterOldFilter(FileName: String);
+var
+  Path: String;
+  Status: Integer;
+begin
+  Path := ExpandConstant('{app}\Filters\') + FileName;
+  if FileExists(Path) then
+    Exec(ExpandConstant('{sys}\regsvr32.exe'), '/s /u "' + Path + '"', '', SW_HIDE, ewWaitUntilTerminated, Status);
+end;
+
+// This is the per-machine product code of the published 1.9.3 ARM64 MSI.
+function MsiQueryProductState(Product: String): Integer;
+external 'MsiQueryProductStateW@msi.dll stdcall';
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+const
+  LegacyProduct = '{3C9B7952-98AC-4240-B0F1-825776ECC782}';
+var
+  Status: Integer;
+begin
+  Result := '';
+  if MsiQueryProductState(LegacyProduct) <> 5 then Exit;
+  Log('Removing the previous MPC-BE ARM64 MSI');
+  if not Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + LegacyProduct + ' /qn /norestart',
+    '', SW_HIDE, ewWaitUntilTerminated, Status) then
+    Result := SysErrorMessage(Status)
+  else if Status = 3010 then
+    NeedsRestart := True
+  else if Status <> 0 then
+    Result := Format('Windows Installer (%d): %s', [Status, SysErrorMessage(Status)]);
+end;
+#endif
 
 function InitializeUninstall(): Boolean;
 begin

@@ -130,6 +130,7 @@ STDAPI DllRegisterServer(void)
 					cbName = IS_KEY_LEN;
 				}
 				reg.Close();
+				hr = S_OK;
 			}
 		}
 	}
