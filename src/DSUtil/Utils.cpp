@@ -373,8 +373,8 @@ bool StrToDouble(const wchar_t* str, double& value)
 CStringW HR2Str(const HRESULT hr)
 {
 	CStringW str;
-#define UNPACK_VALUE(VALUE) case VALUE: str = L#VALUE; break;
-#define UNPACK_HR_WIN32(VALUE) case (((VALUE) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000): str = L#VALUE; break;
+#define UNPACK_VALUE(VALUE) case VALUE: str = L"" #VALUE; break;
+#define UNPACK_HR_WIN32(VALUE) case (((VALUE) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000): str = L"" #VALUE; break;
 	switch (hr) {
 		// Common HRESULT Values https://learn.microsoft.com/en-us/windows/win32/seccrypto/common-hresult-values
 		UNPACK_VALUE(S_OK);

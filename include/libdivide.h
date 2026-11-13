@@ -25,7 +25,11 @@
 #endif
 
 #if defined(LIBDIVIDE_SSE2)
+#ifdef _M_ARM64
+#include "sse2neon.h"
+#else
 #include <emmintrin.h>
+#endif
 #endif
 
 #if defined(LIBDIVIDE_AVX2) || defined(LIBDIVIDE_AVX512)

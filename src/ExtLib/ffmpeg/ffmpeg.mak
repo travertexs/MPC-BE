@@ -43,7 +43,7 @@ NASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(ARM64),yes)
 	GCC_PREFIX = aarch64-w64-mingw32-
-	CFLAGS += $(ARM64_INCLUDES) -DWIN64 -D_WIN64 -DPIC -D__USE_MINGW_ANSI_STDIO=0 -Wno-unknown-warning-option
+	CFLAGS += $(ARM64_INCLUDES) -I../zlib -DWIN64 -D_WIN64 -DPIC -D__USE_MINGW_ANSI_STDIO=0 -Wno-unknown-warning-option
 	OPTFLAGS =
 else ifeq ($(64BIT),yes)
 	GCC_PREFIX  = x86_64-w64-mingw32-

@@ -186,7 +186,7 @@ static void asm_blend_row_clipped(void *dst0, const void *src0, uint32 w, ptrdif
 }
 #endif
 
-#if defined(VD_CPU_X86) || defined(VD_CPU_AMD64)
+#if defined(VD_CPU_X86) || defined(VD_CPU_AMD64) || defined(_M_ARM64)
 static void asm_blend_row_SSE2(void *dst, const void *src, uint32 w, ptrdiff_t srcpitch) {
 	__m128i zero = _mm_setzero_si128();
 	__m128i inv = _mm_cmpeq_epi8(zero, zero);
