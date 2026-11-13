@@ -30,7 +30,11 @@
 #include "DSUtil/entities.h"
 #include "Subtitles/TextFile.h"
 
+#ifdef _M_ARM64
+#define RAPIDJSON_NEON
+#else
 #define RAPIDJSON_SSE2
+#endif
 #include <ExtLib/rapidjson/include/rapidjson/document.h>
 
 #define MAXSTORESIZE  2 * MEGABYTE // The maximum size of a buffer for storing the received information is 2 Mb

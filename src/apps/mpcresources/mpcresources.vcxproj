@@ -9,6 +9,10 @@
       <Configuration>Release Arabic</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Arabic|ARM64">
+      <Configuration>Release Arabic</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Armenian|Win32">
       <Configuration>Release Armenian</Configuration>
       <Platform>Win32</Platform>
@@ -16,6 +20,10 @@
     <ProjectConfiguration Include="Release Armenian|x64">
       <Configuration>Release Armenian</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Armenian|ARM64">
+      <Configuration>Release Armenian</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Basque|Win32">
       <Configuration>Release Basque</Configuration>
@@ -25,6 +33,10 @@
       <Configuration>Release Basque</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Basque|ARM64">
+      <Configuration>Release Basque</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Belarusian|Win32">
       <Configuration>Release Belarusian</Configuration>
       <Platform>Win32</Platform>
@@ -32,6 +44,10 @@
     <ProjectConfiguration Include="Release Belarusian|x64">
       <Configuration>Release Belarusian</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Belarusian|ARM64">
+      <Configuration>Release Belarusian</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Bulgarian|Win32">
       <Configuration>Release Bulgarian</Configuration>
@@ -41,6 +57,10 @@
       <Configuration>Release Bulgarian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Bulgarian|ARM64">
+      <Configuration>Release Bulgarian</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Catalan|Win32">
       <Configuration>Release Catalan</Configuration>
       <Platform>Win32</Platform>
@@ -48,6 +68,10 @@
     <ProjectConfiguration Include="Release Catalan|x64">
       <Configuration>Release Catalan</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Catalan|ARM64">
+      <Configuration>Release Catalan</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Chinese Simplified|Win32">
       <Configuration>Release Chinese Simplified</Configuration>
@@ -57,6 +81,10 @@
       <Configuration>Release Chinese Simplified</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Chinese Simplified|ARM64">
+      <Configuration>Release Chinese Simplified</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Chinese Traditional|Win32">
       <Configuration>Release Chinese Traditional</Configuration>
       <Platform>Win32</Platform>
@@ -64,6 +92,10 @@
     <ProjectConfiguration Include="Release Chinese Traditional|x64">
       <Configuration>Release Chinese Traditional</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Chinese Traditional|ARM64">
+      <Configuration>Release Chinese Traditional</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Croatian|Win32">
       <Configuration>Release Croatian</Configuration>
@@ -73,6 +105,10 @@
       <Configuration>Release Croatian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Croatian|ARM64">
+      <Configuration>Release Croatian</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Czech|Win32">
       <Configuration>Release Czech</Configuration>
       <Platform>Win32</Platform>
@@ -80,6 +116,10 @@
     <ProjectConfiguration Include="Release Czech|x64">
       <Configuration>Release Czech</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Czech|ARM64">
+      <Configuration>Release Czech</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Dutch|Win32">
       <Configuration>Release Dutch</Configuration>
@@ -89,6 +129,10 @@
       <Configuration>Release Dutch</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Dutch|ARM64">
+      <Configuration>Release Dutch</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release French|Win32">
       <Configuration>Release French</Configuration>
       <Platform>Win32</Platform>
@@ -96,6 +140,10 @@
     <ProjectConfiguration Include="Release French|x64">
       <Configuration>Release French</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release French|ARM64">
+      <Configuration>Release French</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release German|Win32">
       <Configuration>Release German</Configuration>
@@ -105,6 +153,10 @@
       <Configuration>Release German</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release German|ARM64">
+      <Configuration>Release German</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Greek|Win32">
       <Configuration>Release Greek</Configuration>
       <Platform>Win32</Platform>
@@ -112,6 +164,10 @@
     <ProjectConfiguration Include="Release Greek|x64">
       <Configuration>Release Greek</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Greek|ARM64">
+      <Configuration>Release Greek</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Hebrew|Win32">
       <Configuration>Release Hebrew</Configuration>
@@ -121,6 +177,10 @@
       <Configuration>Release Hebrew</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Hebrew|ARM64">
+      <Configuration>Release Hebrew</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Hungarian|Win32">
       <Configuration>Release Hungarian</Configuration>
       <Platform>Win32</Platform>
@@ -128,6 +188,10 @@
     <ProjectConfiguration Include="Release Hungarian|x64">
       <Configuration>Release Hungarian</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Hungarian|ARM64">
+      <Configuration>Release Hungarian</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Italian|Win32">
       <Configuration>Release Italian</Configuration>
@@ -137,6 +201,10 @@
       <Configuration>Release Italian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Italian|ARM64">
+      <Configuration>Release Italian</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Japanese|Win32">
       <Configuration>Release Japanese</Configuration>
       <Platform>Win32</Platform>
@@ -144,6 +212,10 @@
     <ProjectConfiguration Include="Release Japanese|x64">
       <Configuration>Release Japanese</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Japanese|ARM64">
+      <Configuration>Release Japanese</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Korean|Win32">
       <Configuration>Release Korean</Configuration>
@@ -153,6 +225,10 @@
       <Configuration>Release Korean</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Korean|ARM64">
+      <Configuration>Release Korean</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Polish|Win32">
       <Configuration>Release Polish</Configuration>
       <Platform>Win32</Platform>
@@ -160,6 +236,10 @@
     <ProjectConfiguration Include="Release Polish|x64">
       <Configuration>Release Polish</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Polish|ARM64">
+      <Configuration>Release Polish</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Portuguese|Win32">
       <Configuration>Release Portuguese</Configuration>
@@ -169,6 +249,10 @@
       <Configuration>Release Portuguese</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Portuguese|ARM64">
+      <Configuration>Release Portuguese</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Romanian|Win32">
       <Configuration>Release Romanian</Configuration>
       <Platform>Win32</Platform>
@@ -176,6 +260,10 @@
     <ProjectConfiguration Include="Release Romanian|x64">
       <Configuration>Release Romanian</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Romanian|ARM64">
+      <Configuration>Release Romanian</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Russian|Win32">
       <Configuration>Release Russian</Configuration>
@@ -185,6 +273,10 @@
       <Configuration>Release Russian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Russian|ARM64">
+      <Configuration>Release Russian</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Slovak|Win32">
       <Configuration>Release Slovak</Configuration>
       <Platform>Win32</Platform>
@@ -193,6 +285,10 @@
       <Configuration>Release Slovak</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Slovak|ARM64">
+      <Configuration>Release Slovak</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Slovenian|Win32">
       <Configuration>Release Slovenian</Configuration>
       <Platform>Win32</Platform>
@@ -200,6 +296,10 @@
     <ProjectConfiguration Include="Release Slovenian|x64">
       <Configuration>Release Slovenian</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Slovenian|ARM64">
+      <Configuration>Release Slovenian</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>	
     <ProjectConfiguration Include="Release Spanish|Win32">
       <Configuration>Release Spanish</Configuration>
@@ -209,6 +309,10 @@
       <Configuration>Release Spanish</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Spanish|ARM64">
+      <Configuration>Release Spanish</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Swedish|Win32">
       <Configuration>Release Swedish</Configuration>
       <Platform>Win32</Platform>
@@ -216,6 +320,10 @@
     <ProjectConfiguration Include="Release Swedish|x64">
       <Configuration>Release Swedish</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Swedish|ARM64">
+      <Configuration>Release Swedish</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release Turkish|Win32">
       <Configuration>Release Turkish</Configuration>
@@ -225,6 +333,10 @@
       <Configuration>Release Turkish</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Turkish|ARM64">
+      <Configuration>Release Turkish</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Ukrainian|Win32">
       <Configuration>Release Ukrainian</Configuration>
       <Platform>Win32</Platform>
@@ -233,6 +345,10 @@
       <Configuration>Release Ukrainian</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Ukrainian|ARM64">
+      <Configuration>Release Ukrainian</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release Vietnamese|Win32">
       <Configuration>Release Vietnamese</Configuration>
       <Platform>Win32</Platform>
@@ -240,6 +356,10 @@
     <ProjectConfiguration Include="Release Vietnamese|x64">
       <Configuration>Release Vietnamese</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Vietnamese|ARM64">
+      <Configuration>Release Vietnamese</Configuration>
+      <Platform>ARM64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -381,6 +501,7 @@
   <PropertyGroup>
     <OutDir Condition="'$(Platform)'=='Win32'">$(SolutionDir)_bin\mpc-be_x86\Lang\</OutDir>
     <OutDir Condition="'$(Platform)'=='x64'">$(SolutionDir)_bin\mpc-be_x64\Lang\</OutDir>
+    <OutDir Condition="'$(Platform)'=='ARM64'">$(SolutionDir)_bin\mpc-be_ARM64\Lang\</OutDir>
     <IntDir>$(SolutionDir)_obj\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
     <TargetName Condition="'$(Configuration)'=='Release Arabic'">$(ProjectName).ar</TargetName>
     <TargetName Condition="'$(Configuration)'=='Release Armenian'">$(ProjectName).hy</TargetName>

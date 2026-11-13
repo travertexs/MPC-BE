@@ -28,7 +28,11 @@
 #include <wmcodecdsp.h>
 #include <moreuuids.h>
 
+#ifdef _M_ARM64
+#define RAPIDJSON_NEON
+#else
 #define RAPIDJSON_SSE2
+#endif
 #include <ExtLib/rapidjson/include/rapidjson/document.h>
 
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)

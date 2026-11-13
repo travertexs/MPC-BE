@@ -123,6 +123,7 @@ static __forceinline void cvtdq2ps(__m128 &dst,const __m128i &src)
 	dst=_mm_cvtepi32_ps(src);
 }
 
+#ifndef _M_ARM64
 static __forceinline void movlpd(__m128d &dst,const void *src)
 {
 	dst=_mm_loadl_pd(dst,(double*)src);
@@ -139,6 +140,7 @@ static __forceinline void movhpd(void *dst,const __m128d &src)
 {
 	_mm_storeh_pd((double*)dst,src);
 }
+#endif
 
 // load the same width as the register aligned
 static __forceinline void movVqa(__m128i &dst, const void *ptr)
