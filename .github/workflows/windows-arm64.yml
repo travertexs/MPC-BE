@@ -61,6 +61,17 @@ jobs:
         with:
           name: arm64-codecs
           path: libarm64
+      - name: Build Fraunhofer AAC with the Windows ARM64 C++ toolchain
+        shell: cmd
+        run: |
+          call "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" -arch=arm64 -host_arch=x64
+          git clone --quiet --depth 1 --branch v2.0.3 https://github.com/mstorsjo/fdk-aac.git "%RUNNER_TEMP%\fdk-aac"
+          if errorlevel 1 exit /b 1
+          cmake -S "%RUNNER_TEMP%\fdk-aac" -B "%RUNNER_TEMP%\fdk-build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded -DBUILD_SHARED_LIBS=OFF
+          if errorlevel 1 exit /b 1
+          cmake --build "%RUNNER_TEMP%\fdk-build"
+          if errorlevel 1 exit /b 1
+          copy /y "%RUNNER_TEMP%\fdk-build\fdk-aac.lib" libarm64\fdk-aac.lib
       - name: Compile player projects for ARM64
         shell: cmd
         run: |
