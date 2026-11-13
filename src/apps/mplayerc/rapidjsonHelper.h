@@ -20,7 +20,11 @@
 
 #pragma once
 
+#ifdef _M_ARM64
+#define RAPIDJSON_NEON
+#else
 #define RAPIDJSON_SSE2
+#endif
 #include "ExtLib/rapidjson/include/rapidjson/document.h"
 #include "ExtLib/rapidjson/include/rapidjson/pointer.h"
 

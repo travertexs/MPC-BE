@@ -1226,6 +1226,7 @@ namespace
 		}
 	};
 
+#ifndef _M_ARM64
 	struct AVX2 {
 
 		// Calculate alpha value AVX2
@@ -1504,6 +1505,7 @@ namespace
 			}
 		}
 	};
+#endif
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -1808,9 +1810,11 @@ CRect Rasterizer::DrawImpl(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, i
 CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub,
 					   const DWORD* switchpts, bool fBody, bool fBorder) const
 {
+#ifndef _M_ARM64
 	if (m_bUseAVX2) {
 		return DrawImpl<AVX2>(spd, clipRect, pAlphaMask, xsub, ysub, switchpts, fBody, fBorder);
 	}
+#endif
 	return DrawImpl<SSE2>(spd, clipRect, pAlphaMask, xsub, ysub, switchpts, fBody, fBorder);
 }
 
@@ -1829,9 +1833,12 @@ void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nH
 		return;
 	}
 
+#ifndef _M_ARM64
 	if (m_bUseAVX2) {
 		FillSolidRectImpl<AVX2>(spd, x, y, nWidth, nHeight, lColor);
-	} else {
+	} else
+#endif
+	{
 		FillSolidRectImpl<SSE2>(spd, x, y, nWidth, nHeight, lColor);
 	}
 }
