@@ -32,19 +32,19 @@ jobs:
           path: libarm64/
           if-no-files-found: error
   player:
+    needs: codecs
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - name: Fetch source dependencies
         run: |
           git submodule update --init --depth 1 -- src/ExtLib
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Invoke-WebRequest https://raw.githubusercontent.com/DLTcollab/sse2neon/2272251cc3ad9cba8b8c47c4065811cfb396b802/sse2neon.h -OutFile include/sse2neon.h
       - name: Fetch native codec archives
-        if: ${{ !cancelled() }}
-        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: arm64-codecs

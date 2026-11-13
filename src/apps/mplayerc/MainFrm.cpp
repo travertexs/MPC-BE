@@ -502,7 +502,7 @@ END_MESSAGE_MAP()
 #ifdef DEBUG_OR_LOG
 const WCHAR* GetEventString(LONG evCode)
 {
-#define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
+#define UNPACK_VALUE(VALUE) case VALUE: return L"" #VALUE;
 	switch (evCode) {
 		UNPACK_VALUE(EC_COMPLETE);
 		UNPACK_VALUE(EC_USERABORT);

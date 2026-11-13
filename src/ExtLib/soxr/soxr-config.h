@@ -20,10 +20,14 @@
 #define WITH_CR32 1
 #ifndef _M_ARM64
 #define WITH_CR32S 1
+#else
+#define WITH_CR32S 0
 #endif
 #define WITH_CR64 1
 #ifndef _M_ARM64
 #define WITH_CR64S 1
+#else
+#define WITH_CR64S 0
 #endif
 #define WITH_VR32 1
 

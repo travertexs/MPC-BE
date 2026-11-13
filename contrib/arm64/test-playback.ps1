@@ -8,7 +8,7 @@ if ([BitConverter]::ToUInt32($b, $pe) -ne 0x4550 -or [BitConverter]::ToUInt16($b
 }
 # The uncompressed null renderer exercises decoding without requiring a VM sound device.
 $ini = [IO.Path]::ChangeExtension($exe, '.ini')
-[IO.File]::WriteAllText($ini, "[Audio]\r\nAudioRenderer=Null Audio Renderer (Uncompressed)\r\n".Replace('\r\n', [Environment]::NewLine), [Text.Encoding]::Unicode)
+[IO.File]::WriteAllText($ini, "[WebServer]\r\nLocalhostOnly=1\r\n[Audio]\r\nAudioRenderer=Null Audio Renderer (Uncompressed)\r\n".Replace('\r\n', [Environment]::NewLine), [Text.Encoding]::Unicode)
 $media = Join-Path $PWD 'tone.wav'
 $rate = 8000
 $samples = $rate * 16

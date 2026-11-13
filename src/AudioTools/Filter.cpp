@@ -40,7 +40,7 @@ static CStringW AvError2Str(const int averror)
 	if (averror >= 0) {
 		str = L"OK";
 	} else {
-#define UNPACK_VALUE(VALUE) case VALUE: str = L#VALUE; break;
+#define UNPACK_VALUE(VALUE) case VALUE: str = L"" #VALUE; break;
 		switch (averror) {
 			UNPACK_VALUE(AVERROR(EIO))
 			UNPACK_VALUE(AVERROR(EAGAIN))

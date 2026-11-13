@@ -1451,7 +1451,7 @@ void CMpcAudioRenderer::SetBalanceMask(const DWORD output_layout)
 
 static const WCHAR* GetSampleFormatString(const SampleFormat value)
 {
-#define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
+#define UNPACK_VALUE(VALUE) case VALUE: return L"" #VALUE;
 	switch (value) {
 		UNPACK_VALUE(SAMPLE_FMT_U8);
 		UNPACK_VALUE(SAMPLE_FMT_S16);
@@ -2673,7 +2673,7 @@ bool CMpcAudioRenderer::CreateSupportedFormatList()
 			}
 		}
 
-#define ADDENTRY(mode) ChannelMaskStr[mode] = L#mode
+#define ADDENTRY(mode) ChannelMaskStr[mode] = L"" #mode
 		std::map<DWORD, CString> ChannelMaskStr;
 		ADDENTRY(KSAUDIO_SPEAKER_STEREO);
 		ADDENTRY(KSAUDIO_SPEAKER_QUAD);

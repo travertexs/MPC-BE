@@ -107,7 +107,7 @@ HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen
 
 CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module)
 {
-#define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
+#define UNPACK_VALUE(VALUE) case VALUE: return L"" #VALUE;
 	switch (_Error) {
 		UNPACK_VALUE(D3DERR_OUTOFVIDEOMEMORY);
 		UNPACK_VALUE(D3DERR_WASSTILLDRAWING);
@@ -156,7 +156,7 @@ CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module)
 
 const wchar_t* D3DFormatToString(D3DFORMAT format)
 {
-#define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
+#define UNPACK_VALUE(VALUE) case VALUE: return L"" #VALUE;
 	switch (format) {
 	//	UNPACK_VALUE(D3DFMT_R8G8B8);
 		UNPACK_VALUE(D3DFMT_A8R8G8B8);
