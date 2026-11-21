@@ -33,6 +33,22 @@ $ax = Get-ChildItem $fixture -Recurse -Filter $module | Select-Object -First 1
 if (!$ax) { throw "Missing $module in $fixture" }
 $proc = Start-Process regsvr32.exe "/s `"$($ax.FullName)`"" -Wait -PassThru
 if ($proc.ExitCode) { throw "Registering $module returned $($proc.ExitCode)" }
+# Run upstream's x64 player on the same virtual display and Windows build for comparison.
+$upstream = Join-Path $env:RUNNER_TEMP 'upstream-x64.7z'
+curl.exe -fLsS --retry 3 'https://github.com/Aleksoid1978/MPC-BE/releases/download/1.9.3/MPC-BE.1.9.3.x64.7z' -o $upstream
+if ($LASTEXITCODE -or (Get-FileHash $upstream).Hash -ne 'db3d833548065b783bdbd415a685ffda2cf49d932d4ab7bf6d03781df4c66115') {
+    throw 'Unable to verify upstream x64 player'
+}
+$reference = Join-Path $env:RUNNER_TEMP 'upstream-x64'
+7z x $upstream "-o$reference" -bso0
+if ($LASTEXITCODE) { throw 'Unable to extract upstream x64 player' }
+$x64 = Get-ChildItem $reference -Recurse -Filter mpc-be64.exe | Select-Object -First 1
+try {
+    & ./contrib/arm64/test-playback.ps1 -PlayerDirectory $x64.DirectoryName -PlayerName $x64.Name -Compatibility -ExternalRenderer $Renderer
+    Write-Host "Upstream x64 rendered H.264 using $label on this runner"
+} catch {
+    Write-Warning "Upstream x64 reference playback: $($_.Exception.Message)"
+}
 $folder = Join-Path $env:ProgramFiles 'MPC-BE/Compatibility'
 python ./contrib/arm64/test-renderer-ui.py "$folder/mpc-be64.exe" $label
 if ($LASTEXITCODE) { throw "$label missing from the compatible player's Video options" }
