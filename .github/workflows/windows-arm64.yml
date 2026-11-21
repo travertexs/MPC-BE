@@ -10,7 +10,7 @@ permissions:
   contents: read
 concurrency:
   group: arm64-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   codecs:
     runs-on: ubuntu-24.04
@@ -74,19 +74,44 @@ jobs:
         run: |
           git submodule update --init --depth 1 -- src/ExtLib
           if ($LASTEXITCODE) {exit $LASTEXITCODE}
-          curl.exe -fLsS --retry 3 https://raw.githubusercontent.com/Aleksoid1978/MSYS/main/MSYS_MinGW-w64_GCC_1521_x86-x64.7z -o "$env:RUNNER_TEMP/msys.7z"
+          curl.exe -fLsS --retry 3 https://raw.githubusercontent.com/Aleksoid1978/MSYS/3d89b54078e6410b625a618367c7f640da6b9802/MSYS_MinGW-w64_GCC_1521_x86-x64.7z -o "$env:RUNNER_TEMP/msys.7z"
           if ($LASTEXITCODE) {exit $LASTEXITCODE}
           7z x "$env:RUNNER_TEMP/msys.7z" -oC:\MSYS -bso0
           if ($LASTEXITCODE) {exit $LASTEXITCODE}
           @('@echo off','set "MPCBE_MSYS=C:\MSYS"','set "MPCBE_MINGW=C:\MSYS\mingw"') | Set-Content environments.bat -Encoding ascii
           .\update_gcc.bat
           .\update_revision.cmd
+      - uses: actions/cache/restore@v4
+        id: deps
+        with:
+          path: |
+            _bin/lib/Release_x64
+            _bin/shaders
+          key: ec-static-v1-${{ hashFiles('src/**','include/**','lib64/*.lib','lib64/libdav1d.a') }}
+      - if: steps.deps.outputs.cache-hit != 'true'
+        name: Build the upstream x64 static filter libraries
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+          $env:_CL_ = '/GL-'
+          & "$vs\MSBuild\Current\Bin\amd64\MSBuild.exe" src/apps/mplayerc/mpc-be.vcxproj /m:3 /p:Configuration=Release /p:Platform=x64 "/p:SolutionDir=$pwd\" /p:CL_MPCount=2 /v:minimal
+          if ($LASTEXITCODE) {exit $LASTEXITCODE}
+      - if: steps.deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            _bin/lib/Release_x64
+            _bin/shaders
+          key: ec-static-v1-${{ hashFiles('src/**','include/**','lib64/*.lib','lib64/libdav1d.a') }}
       - name: Build the ARM64EC player for external x64 plug-ins
         run: ./contrib/arm64/build-ec.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: arm64ec-player
-          path: ec-player/mpc-be64.exe
+          path: |
+            ec-player/*.exe
+            ec-player/*.dll
+            ec-player/*.ax
+            ec-player/Lang/*.dll
           if-no-files-found: error
   player:
     needs: codecs
@@ -159,7 +184,7 @@ jobs:
             _bin/mpc-be_ARM64/Shaders11/
           if-no-files-found: error
   installer:
-    needs: [player, filters]
+    needs: [player, filters, compatibility]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -173,6 +198,10 @@ jobs:
         with:
           name: native-filters
           path: _bin/mpc-be_ARM64/Filters
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64ec-player
+          path: _bin/mpc-be_ARM64/Compatibility
       - name: Compile the upstream interactive setup for Windows on Arm
         run: ./contrib/arm64/package-setup.ps1
       - uses: actions/upload-artifact@v4

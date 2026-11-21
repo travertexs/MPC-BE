@@ -751,7 +751,15 @@ HRESULT CheckFilterCLSID(const CLSID& clsid)
 					&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buf, &len)
 					&& ::PathFileExistsW(buf)) {
 
+#if defined(_M_ARM64) || defined(_M_ARM64EC)
+				// Arm64 and x64 share the 64-bit registry. Confirm an in-process filter
+				// can actually load under this player's ABI before offering it.
+				CComPtr<IClassFactory> factory;
+				return SUCCEEDED(CoGetClassObject(clsid, CLSCTX_INPROC_SERVER, nullptr,
+					IID_PPV_ARGS(&factory))) ? S_OK : S_FALSE;
+#else
 				return S_OK; // installed and available
+#endif
 			}
 
 			return S_FALSE; // installed but not available

@@ -41,6 +41,8 @@ function Uninstall-Player {
 python ./contrib/arm64/test-wizard.py $setup
 if ($LASTEXITCODE) { throw 'Interactive setup test failed' }
 Assert-Installation $defaultFolder
+python ./contrib/arm64/test-renderer-ui.py "$defaultFolder/mpc-be64.exe"
+if ($LASTEXITCODE) { throw 'Video renderer options test failed' }
 if (!(Test-Path "$defaultFolder/Filters/MpcVideoRenderer64.ax")) { throw 'Default install omitted MPC Video Renderer' }
 Uninstall-Player
 
@@ -64,7 +66,7 @@ New-Item $settings -Force | Out-Null
 Set-ItemProperty $settings Volume 67
 $ini = Join-Path $folder 'mpc-be64.ini'
 [IO.File]::WriteAllText($ini, "[Settings]`r`nVolume=67`r`n", [Text.Encoding]::Unicode)
-Invoke-Setup $setup "$flags /COMPONENTS=main,mpciconlib,mpcresources,mpcbeshellext,mpcvr,mpcscriptsrc,mpcimagesrc /LOG=upgrade.log"
+Invoke-Setup $setup "$flags /COMPONENTS=main,mpciconlib,mpcresources,mpcbeshellext,compatibility,mpcvr,mpcscriptsrc,mpcimagesrc /LOG=upgrade.log"
 Assert-Installation $folder
 if ((Get-Content $ini -Raw) -notmatch 'Volume=67' -or (Get-ItemPropertyValue $settings Volume) -ne 67) { throw 'Settings did not survive upgrade' }
 if ((Test-Path "$env:ProgramFiles\MPC-BE ARM64\mpc-be-arm64.exe") -or (Test-Path "$commonPrograms\MPC-BE (ARM64).lnk") -or
@@ -78,5 +80,7 @@ foreach ($clsid in '71F080AA-8661-4093-B15E-4F6903E77D0A','7D3BBD5A-880D-4A30-A2
     Write-Host "Activated DirectShow filter $clsid"
 }
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory $folder -PlayerName mpc-be64.exe
+& ./contrib/arm64/test-playback.ps1 -PlayerDirectory (Join-Path $folder Compatibility) -PlayerName mpc-be64.exe -Compatibility
+Remove-Item -LiteralPath "$folder/Compatibility/mpc-be64.ini"
 Remove-Item -LiteralPath $ini
 Uninstall-Player

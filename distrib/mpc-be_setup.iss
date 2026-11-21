@@ -229,7 +229,9 @@ Name: "mpciconlib";    Description: "{cm:comp_mpciconlib}";     Types: default c
 Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default custom; Flags: disablenouninstallwarning
 #endif
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
-#ifndef Arm64Build
+#ifdef Arm64Build
+Name: "compatibility"; Description: "ARM64EC player for x64 filters and devices"; Types: default custom; Flags: disablenouninstallwarning
+#else
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning;
 #endif
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: default custom; Flags: disablenouninstallwarning;
@@ -273,6 +275,7 @@ Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";          
 Source: "VisualElements\*.png";            DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 #ifdef Arm64Build
+Source: "{#bindir}\Compatibility\*"; DestDir: "{app}\Compatibility"; Flags: ignoreversion recursesubdirs; Components: compatibility
 Source: "{#bindir}\Filters\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcvr
 Source: "{#bindir}\Filters\MpcScriptSource64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcscriptsrc
 Source: "{#bindir}\Filters\MpcImageSource64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcimagesrc
@@ -293,6 +296,9 @@ Source: "MPC_components\MpcImageSource\MpcImageSource64.ax"; DestDir: "{app}\Fil
 #endif
 
 [Icons]
+#ifdef Arm64Build
+Name: {group}\MPC-BE arm64 (x64 plug-ins); Filename: {app}\Compatibility\mpc-be64.exe; WorkingDir: {app}\Compatibility; Parameters: /new; Components: compatibility
+#endif
 #ifdef Win32Build
 Name: {group}\{#app_name};                           Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0
 Name: {commondesktop}\{#app_name};                   Filename: {app}\{#mpcbe_exe};      Comment: {#app_name} {#app_version};            WorkingDir: {app}; IconFilename: {app}\{#mpcbe_exe}; IconIndex: 0; Tasks: desktopicon\common
