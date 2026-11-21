@@ -5,9 +5,9 @@ root=$1
 deps=$2
 tmp=$3
 src="$root/src/ExtLib/ffmpeg"
-revision=11ef8d60d670b6908185a4780ad1a33b77783b0f
+revision=e8574d0b22b126acc76007babce536c68bc07d0a
 curl -fsSL --retry 3 "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/$revision" -o "$tmp/ffmpeg.tar.gz"
-echo "26e5a531732219fa685b1b6e9a35f13ef71346ca9a16578088ae3c1fb9c19a39  $tmp/ffmpeg.tar.gz" | sha256sum -c -
+echo "4434c512b641b868db9f9554445ec453f3d8df5d15e109070477c8d819973e1c  $tmp/ffmpeg.tar.gz" | sha256sum -c -
 mkdir "$tmp/upstream"
 tar xf "$tmp/ffmpeg.tar.gz" --strip-components=1 -C "$tmp/upstream"
 

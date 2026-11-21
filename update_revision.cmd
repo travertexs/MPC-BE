@@ -42,7 +42,7 @@ FOR /F "delims=" %%A IN ('%gitexe% log -1 --date^=format:%%Y-%%m-%%d --pretty^=f
 :ÑHANGE_ÑHECK
 
 REM The release build is based on an upstream stable tag with downstream port commits.
-IF "%MPCBE_STABLE_RELEASE%"=="1" SET GIT_REV_COUNT=0
+IF DEFINED MPCBE_UPSTREAM_REV SET GIT_REV_COUNT=%MPCBE_UPSTREAM_REV%
 
 SET SrcManifest="src\apps\mplayerc\res\mpc-be.exe.manifest.conf"
 SET DstManifest="src\apps\mplayerc\res\mpc-be.exe.manifest"

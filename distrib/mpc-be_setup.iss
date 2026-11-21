@@ -231,11 +231,10 @@ Name: "mpcresources";  Description: "{cm:comp_mpcresources}";   Types: default c
 Name: "mpcbeshellext"; Description: "{cm:comp_mpcbeshellext}";  Types: custom;         Flags: disablenouninstallwarning;
 #ifndef Arm64Build
 Name: "intel_msdk";    Description: "{cm:comp_intel_msdk}";     Types: custom;         Flags: disablenouninstallwarning;
+#endif
 Name: "mpcvr";         Description: "{#mpcvr_desc}";            Types: default custom; Flags: disablenouninstallwarning;
 Name: "mpcscriptsrc";  Description: "{#mpcscriptsrc_desc}";     Types: custom;         Flags: disablenouninstallwarning;
 Name: "mpcimagesrc";   Description: "{#mpcimagesrc_desc}";      Types: custom;         Flags: disablenouninstallwarning;
-
-#endif
 
 [Tasks]
 Name: desktopicon;              Description: {cm:CreateDesktopIcon};     GroupDescription: {cm:AdditionalIcons}
@@ -273,7 +272,12 @@ Source: "Shaders11\*.hlsl";                DestDir: "{commonappdata}\{#app_name}
 Source: "Shaders11\*.hlsl";                DestDir: "{app}\Shaders11";                   Flags: ignoreversion; Components: main; Check: IniUsed()
 Source: "VisualElements\*.png";            DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "{#VisualElementsManifest}";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
-#ifndef Arm64Build
+#ifdef Arm64Build
+Source: "{#bindir}\Filters\MpcVideoRenderer64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcvr
+Source: "{#bindir}\Filters\MpcScriptSource64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcscriptsrc
+Source: "{#bindir}\Filters\MpcImageSource64.ax"; DestDir: "{app}\Filters"; Flags: ignoreversion regserver 64bit; Components: mpcimagesrc
+Source: "{#bindir}\Filters\*LICENSE*"; DestDir: "{app}\Filters\Licenses"; Flags: ignoreversion
+#else
 #ifdef Win32Build
 Source: "MPC_components\IntelMediaSDK\libmfxsw32.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: intel_msdk;
 Source: "MPC_components\MpcVideoRenderer\MpcVideoRenderer.ax"; DestDir: "{app}\Filters"; Flags: regserver; Components: mpcvr;

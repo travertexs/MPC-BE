@@ -2,7 +2,7 @@ param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.e
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path (Join-Path $PlayerDirectory $PlayerName)).Path
-$images = @(Get-Item $exe) + @(Get-ChildItem $PlayerDirectory -Recurse -Filter *.dll)
+$images = @(Get-Item $exe) + @(Get-ChildItem $PlayerDirectory -Recurse -Include *.dll,*.ax)
 if ($images.Count -lt 3) { throw 'Player resource DLLs are missing' }
 foreach ($file in $images) {
     $b = [IO.File]::ReadAllBytes($file.FullName)

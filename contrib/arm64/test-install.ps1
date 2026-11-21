@@ -18,7 +18,7 @@ function Assert-Installation([string]$folder) {
     $shortcut = Join-Path $commonPrograms "$($app.'Inno Setup: Icon Group')\MPC-BE arm64.lnk"
     $info = (Get-Item $player).VersionInfo
     if ($app.DisplayName -cne "MPC-BE arm64 $Version" -or $app.DisplayVersion -ne $Version -or
-        $info.FileVersionRaw -ne [version]"$Version.0" -or $app.InstallLocation.TrimEnd('\') -ne $folder) {
+        $info.FileVersionRaw -ne [version]$Version -or $app.InstallLocation.TrimEnd('\') -ne $folder) {
         throw "Incorrect Installed apps metadata: $($app | Out-String)"
     }
     $appPath = (Get-Item 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\mpc-be64.exe').GetValue('')
@@ -41,6 +41,7 @@ function Uninstall-Player {
 python ./contrib/arm64/test-wizard.py $setup
 if ($LASTEXITCODE) { throw 'Interactive setup test failed' }
 Assert-Installation $defaultFolder
+if (!(Test-Path "$defaultFolder/Filters/MpcVideoRenderer64.ax")) { throw 'Default install omitted MPC Video Renderer' }
 Uninstall-Player
 
 # Recreate both entries from the reported machine, including a non-default upstream directory.
@@ -63,7 +64,7 @@ New-Item $settings -Force | Out-Null
 Set-ItemProperty $settings Volume 67
 $ini = Join-Path $folder 'mpc-be64.ini'
 [IO.File]::WriteAllText($ini, "[Settings]`r`nVolume=67`r`n", [Text.Encoding]::Unicode)
-Invoke-Setup $setup "$flags /COMPONENTS=main,mpciconlib,mpcresources,mpcbeshellext /LOG=upgrade.log"
+Invoke-Setup $setup "$flags /COMPONENTS=main,mpciconlib,mpcresources,mpcbeshellext,mpcvr,mpcscriptsrc,mpcimagesrc /LOG=upgrade.log"
 Assert-Installation $folder
 if ((Get-Content $ini -Raw) -notmatch 'Volume=67' -or (Get-ItemPropertyValue $settings Volume) -ne 67) { throw 'Settings did not survive upgrade' }
 if ((Test-Path "$env:ProgramFiles\MPC-BE ARM64\mpc-be-arm64.exe") -or (Test-Path "$commonPrograms\MPC-BE (ARM64).lnk") -or
@@ -71,6 +72,11 @@ if ((Test-Path "$env:ProgramFiles\MPC-BE ARM64\mpc-be-arm64.exe") -or (Test-Path
 $com = Get-Item 'Registry::HKEY_CLASSES_ROOT\CLSID\{A2CF4243-6525-4764-B3F5-2FCDE2F47989}\InprocServer32'
 if ($com.GetValue('') -ne "$folder\MPCBEShellExt64.dll") { throw 'Shell extension registration mismatch' }
 Write-Host 'Verified upgrade from official x64 1.9.0 and published ARM64 MSI, including shared settings and custom directory.'
+foreach ($clsid in '71F080AA-8661-4093-B15E-4F6903E77D0A','7D3BBD5A-880D-4A30-A2D1-7B8C2741AFEF','7DB5C3B3-2419-4508-B1D0-F2D22DA8E439') {
+    $filter = [Activator]::CreateInstance([type]::GetTypeFromCLSID([guid]$clsid))
+    [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($filter)
+    Write-Host "Activated DirectShow filter $clsid"
+}
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory $folder -PlayerName mpc-be64.exe
 Remove-Item -LiteralPath $ini
 Uninstall-Player

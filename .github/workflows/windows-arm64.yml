@@ -1,11 +1,11 @@
 name: Windows ARM64
 on:
   push:
-    branches: ['release/1.9.3-arm64']
+    branches: ['arm64/upstream']
   workflow_dispatch:
 env:
-  MPCBE_STABLE_RELEASE: 1
-  RELEASE_VERSION: 1.9.3
+  MPCBE_UPSTREAM_REV: 29
+  RELEASE_VERSION: 1.9.3.29
 permissions:
   contents: read
 concurrency:
@@ -45,6 +45,22 @@ jobs:
         with:
           name: test-media
           path: media/
+          if-no-files-found: error
+  filters:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Compile native DirectShow filters
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+          Invoke-WebRequest https://raw.githubusercontent.com/DLTcollab/sse2neon/2272251cc3ad9cba8b8c47c4065811cfb396b802/sse2neon.h -OutFile include/sse2neon.h
+          python contrib/arm64/build-filters.py "$vs\MSBuild\Current\Bin\amd64\MSBuild.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-filters
+          path: filter-artifacts
           if-no-files-found: error
   player:
     needs: codecs
@@ -117,7 +133,7 @@ jobs:
             _bin/mpc-be_ARM64/Shaders11/
           if-no-files-found: error
   installer:
-    needs: player
+    needs: [player, filters]
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -127,6 +143,10 @@ jobs:
         with:
           name: MPC-BE-Windows-ARM64
           path: _bin/mpc-be_ARM64
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-filters
+          path: _bin/mpc-be_ARM64/Filters
       - name: Compile the upstream interactive setup for Windows on Arm
         run: ./contrib/arm64/package-setup.ps1
       - uses: actions/upload-artifact@v4

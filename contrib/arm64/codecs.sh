@@ -13,8 +13,8 @@ tar xf "$archive"
 export PATH="$tmp/$(basename "$archive" .tar.xz)/bin:$PATH"
 target=aarch64-w64-mingw32
 # Build AV1 with dav1d's AArch64 assembly and compile against its own installed headers.
-git clone -q --depth 1 --branch 1.5.4 https://github.com/videolan/dav1d.git
-test "$(git -C dav1d rev-parse HEAD)" = 54706fc6bc0cdecab7e9593974a4039cc038fca7
+git clone -q --depth 1 --branch 1.5.5 https://github.com/videolan/dav1d.git
+test "$(git -C dav1d rev-parse HEAD)" = 6c7bee685677fd997a431302be4fea8ea4017606
 cat > windows-arm64.ini <<EOF
 [binaries]
 c = '$target-clang'
