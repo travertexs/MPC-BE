@@ -65,6 +65,10 @@ while process.poll() is None and time.monotonic() < deadline:
         if signature != previous:
             print('Wizard:', labels, flush=True)
             previous = signature
+        if 'Select Destination Location' in labels and any(t.lower().endswith(r'\mpc-be') for t in labels):
+            seen.add('destination')
+        if 'Select Components' in labels and any(c == 'TNewComboBox' for _, c, _ in controls):
+            seen.add('components')
         if time.monotonic() - last_clicked < .8:
             continue
         for handle, ctrl, label in controls:
@@ -73,10 +77,6 @@ while process.poll() is None and time.monotonic() < deadline:
                 if not user.SendMessageW(handle, 0x00F0, 0, 0):
                     click(handle)
                     time.sleep(.3)
-            if ctrl.endswith('Edit') and label.lower().endswith(r'\mpc-be'):
-                seen.add('destination')
-            if ctrl == 'TNewComboBox':
-                seen.add('components')
         action = next(((h, t) for h, c, t in controls if c.endswith('Button') and t in ('Next >', 'Next', 'Install', 'Finish') and user.IsWindowEnabled(h)), None)
         if action:
             handle, label = action
