@@ -1,5 +1,5 @@
 param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility,
-      [ValidateSet('Franky','Haali','madVR')][string]$ExternalRenderer, [switch]$Mvc)
+      [ValidateSet('Franky','Haali','madVR')][string]$ExternalRenderer, [switch]$Mvc, [switch]$Sources)
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path (Join-Path $PlayerDirectory $PlayerName)).Path
@@ -63,6 +63,31 @@ function Test-Playback([string]$media, [int]$port, [string]$rendererModule, [int
 }
 
 $port = 17581
+if ($Sources) {
+    $avisynth = Join-Path $env:RUNNER_TEMP 'AviSynthPlus_arm64.exe'
+    Invoke-WebRequest 'https://github.com/AviSynth/AviSynthPlus/releases/download/v3.7.6/AviSynthPlus_3.7.6_20261025_arm64.exe' -OutFile $avisynth
+    if ((Get-FileHash $avisynth).Hash -ne 'ccf9516e320a052a755be16090f0c6f048c19194899249360887d519838c2ccb') { throw 'Unexpected AviSynth+ installer' }
+    $setup = Start-Process $avisynth '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
+    if ($setup.ExitCode) { throw "AviSynth+ setup returned $($setup.ExitCode)" }
+    $settings = $settings.Replace('VideoRenderer=11','VideoRenderer=5').Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
+    [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
+    $avs = Join-Path $env:RUNNER_TEMP 'bars.avs'
+    Set-Content $avs 'ColorBars(width=320,height=240).Trim(0,299).AssumeFPS(25)' -Encoding ascii
+    Test-Playback $avs $port -rendererModule 'MpcScriptSource64.ax' -expectedDuration 12000
+    $bmp = Join-Path $env:RUNNER_TEMP 'slide.bmp'
+    Add-Type -AssemblyName System.Drawing
+    $bitmap = [Drawing.Bitmap]::new(320,240)
+    $graphics = [Drawing.Graphics]::FromImage($bitmap)
+    $graphics.Clear([Drawing.Color]::CornflowerBlue)
+    $graphics.Dispose()
+    $bitmap.Save($bmp, [Drawing.Imaging.ImageFormat]::Bmp)
+    $bitmap.Dispose()
+    $imageSettings = 'HKCU:\Software\MPC-BE Filters\MPC Image Source'
+    New-Item $imageSettings -Force | Out-Null
+    New-ItemProperty $imageSettings -Name ImageDuration -PropertyType DWord -Value 6 -Force | Out-Null
+    Test-Playback $bmp ($port+1) -rendererModule 'MpcImageSource64.ax' -expectedDuration 6000
+    return
+}
 if ($Mvc) {
     $sample = Join-Path $env:RUNNER_TEMP 'small-00000.ssif'
     Invoke-WebRequest 'https://samples.ffmpeg.org/3D/small-00000.ssif' -OutFile $sample

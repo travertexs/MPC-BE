@@ -28,6 +28,6 @@ jobs:
           path: media
       - run: |
           $exe = Get-ChildItem installer/*.exe
-          $p = Start-Process $exe.FullName '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LANG=en' -Wait -PassThru
+          $p = Start-Process $exe.FullName '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LANG=en /COMPONENTS=main,mpciconlib,mpcresources,mpcvr,mpcscriptsrc,mpcimagesrc' -Wait -PassThru
           if ($p.ExitCode) {exit $p.ExitCode}
-          ./contrib/arm64/test-playback.ps1 -Compatibility -PlayerDirectory "$env:ProgramFiles/MPC-BE/Compatibility" -PlayerName mpc-be64.exe -Mvc
+          ./contrib/arm64/test-playback.ps1 -PlayerDirectory "$env:ProgramFiles/MPC-BE" -PlayerName mpc-be64.exe -Sources

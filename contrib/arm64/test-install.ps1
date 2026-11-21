@@ -93,6 +93,8 @@ foreach ($clsid in '71F080AA-8661-4093-B15E-4F6903E77D0A','7D3BBD5A-880D-4A30-A2
 }
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory $folder -PlayerName mpc-be64.exe
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory (Join-Path $folder Compatibility) -PlayerName mpc-be64.exe -Compatibility
+& ./contrib/arm64/test-playback.ps1 -PlayerDirectory (Join-Path $folder Compatibility) -PlayerName mpc-be64.exe -Compatibility -Mvc
+& ./contrib/arm64/test-playback.ps1 -PlayerDirectory $folder -PlayerName mpc-be64.exe -Sources
 Remove-Item -LiteralPath "$folder/Compatibility/mpc-be64.ini"
 Remove-Item -LiteralPath $ini
 Uninstall-Player
