@@ -2,6 +2,9 @@ name: Windows ARM64
 on:
   push:
     branches: ['arm64/upstream']
+    paths-ignore:
+      - '.github/workflows/renderer-check.yml'
+      - 'contrib/arm64/README.md'
   workflow_dispatch:
 env:
   MPCBE_UPSTREAM_REV: 29

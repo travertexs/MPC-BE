@@ -1,0 +1,38 @@
+name: Check native renderer on Windows on Arm
+on:
+  push:
+    branches: ['arm64/upstream']
+    paths:
+      - '.github/workflows/renderer-check.yml'
+      - 'contrib/arm64/test-renderer-ui.py'
+      - 'contrib/arm64/test-playback.ps1'
+permissions:
+  actions: read
+  contents: read
+jobs:
+  renderer:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44920526350
+          name: MPC-BE-ARM64-installer
+          path: installer
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44920526350
+          name: test-media
+          path: media
+      - name: Install the first synced native build
+        run: |
+          $exe = Get-ChildItem installer/*.exe
+          $p = Start-Process $exe.FullName '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LANG=en' -Wait -PassThru
+          if ($p.ExitCode) { exit $p.ExitCode }
+      - name: Read the renderer list from the Video options page
+        run: python ./contrib/arm64/test-renderer-ui.py "$env:ProgramFiles/MPC-BE/mpc-be64.exe"
+      - name: Play H.264 using the native MPC Video Renderer
+        if: success() || failure()
+        run: ./contrib/arm64/test-playback.ps1 -PlayerDirectory "$env:ProgramFiles/MPC-BE" -PlayerName mpc-be64.exe
