@@ -64,7 +64,7 @@ $port = 17581
 if ($ExternalRenderer) {
     $rendererId, $module = switch ($ExternalRenderer) {
         'Franky' { 8; 'FrankyRenderer.ax' }
-        'Haali'  { 6; 'splitter.x64.ax' }
+        'Haali'  { 6; 'dxr.x64.dll' }
         'madVR'  { 7; 'madVR64.ax' }
     }
     $settings = $settings.Replace('VideoRenderer=11',"VideoRenderer=$rendererId").Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")

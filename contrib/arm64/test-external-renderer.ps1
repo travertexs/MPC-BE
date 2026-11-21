@@ -27,12 +27,18 @@ switch ($Renderer) {
 $package = Join-Path $env:RUNNER_TEMP ([uri]$url).Segments[-1]
 curl.exe -fLsS --retry 3 $url -o $package
 if ($LASTEXITCODE -or (Get-FileHash $package).Hash -ne $sha) { throw "Unable to verify $Renderer vendor package" }
-7z x $package "-o$fixture" -bso0 -y
-if ($LASTEXITCODE) { throw "Unable to extract $Renderer" }
-$ax = Get-ChildItem $fixture -Recurse -Filter $module | Select-Object -First 1
-if (!$ax) { throw "Missing $module in $fixture" }
-$proc = Start-Process regsvr32.exe "/s `"$($ax.FullName)`"" -Wait -PassThru
-if ($proc.ExitCode) { throw "Registering $module returned $($proc.ExitCode)" }
+if ($Renderer -eq 'Haali') {
+    # The NSIS installer renames its .new payloads and registers the renderer.
+    $proc = Start-Process $package "/S /D=$fixture" -Wait -PassThru
+    if ($proc.ExitCode) { throw "Haali installer returned $($proc.ExitCode)" }
+} else {
+    7z x $package "-o$fixture" -bso0 -y
+    if ($LASTEXITCODE) { throw "Unable to extract $Renderer" }
+    $ax = Get-ChildItem $fixture -Recurse -Filter $module | Select-Object -First 1
+    if (!$ax) { throw "Missing $module in $fixture" }
+    $proc = Start-Process regsvr32.exe "/s `"$($ax.FullName)`"" -Wait -PassThru
+    if ($proc.ExitCode) { throw "Registering $module returned $($proc.ExitCode)" }
+}
 # Run upstream's x64 player on the same virtual display and Windows build for comparison.
 $upstream = Join-Path $env:RUNNER_TEMP 'upstream-x64.7z'
 curl.exe -fLsS --retry 3 'https://github.com/Aleksoid1978/MPC-BE/releases/download/1.9.3/MPC-BE.1.9.3.x64.7z' -o $upstream
