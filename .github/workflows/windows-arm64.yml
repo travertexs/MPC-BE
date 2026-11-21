@@ -243,3 +243,24 @@ jobs:
         with:
           name: setup-test-logs
           path: '*.log'
+  external-renderer:
+    needs: installer
+    runs-on: windows-11-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        renderer: [Haali, madVR, Franky]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: MPC-BE-ARM64-installer
+          path: installer
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-media
+          path: media
+      - name: Register the vendor renderer, check its Video options entry and test H.264 playback
+        run: ./contrib/arm64/test-external-renderer.ps1 -Renderer ${{ matrix.renderer }}

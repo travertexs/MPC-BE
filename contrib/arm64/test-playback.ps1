@@ -1,4 +1,5 @@
-param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility, [switch]$Franky)
+param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility,
+      [ValidateSet('Franky','Haali','madVR')][string]$ExternalRenderer)
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path (Join-Path $PlayerDirectory $PlayerName)).Path
@@ -60,10 +61,15 @@ function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
 }
 
 $port = 17581
-if ($Franky) {
-    $settings = $settings.Replace('VideoRenderer=11','VideoRenderer=8').Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
+if ($ExternalRenderer) {
+    $rendererId, $module = switch ($ExternalRenderer) {
+        'Franky' { 8; 'FrankyRenderer.ax' }
+        'Haali'  { 6; 'splitter.x64.ax' }
+        'madVR'  { 7; 'madVR64.ax' }
+    }
+    $settings = $settings.Replace('VideoRenderer=11',"VideoRenderer=$rendererId").Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
     [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
-    Test-Playback (Resolve-Path 'media/h264.mp4').Path $port -rendererModule 'FrankyRenderer.ax'
+    Test-Playback (Resolve-Path 'media/h264.mp4').Path $port -rendererModule $module
     return
 }
 foreach ($name in 'tone.flac','h264.mp4','av1.mkv') {
