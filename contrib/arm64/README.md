@@ -14,7 +14,8 @@ Setup uses the upstream 64-bit installer identity, registry view, settings and `
 | --- | --- |
 | Enhanced Video Renderer, EVR custom presenter, Sync Video Renderer and the two null renderers | Available in the native player's Video options. |
 | MPC Video Renderer | Select the component in setup, then select the renderer in Video options. The renderer, its pixel conversion routines and its fullscreen hooks are compiled for ARM64. |
-| MPC Script Source and MPC Image Source | Select the relevant component in setup. These DirectShow filters are compiled for ARM64. Script playback requires the corresponding AviSynth+ or VapourSynth runtime for the player's architecture. |
+| MPC Script Source and MPC Image Source | Select the relevant component in setup. These filters are compiled for ARM64. The script filter uses AviSynth's C interface with the official Windows ARM64 runtime. Install the interpreter separately for the scripts you use. [AviSynth+ ARM64 release](https://github.com/AviSynth/AviSynthPlus/releases/tag/v3.7.6) |
+| VapourSynth scripts | VapourSynth R82 ships a Windows x64 runtime. Use that runtime with MPC Script Source in the compatibility player. [VapourSynth R82](https://github.com/vapoursynth/vapoursynth/releases/tag/R82) |
 | x64-only external renderers including Haali, madVR and FrankyRenderer | Install the renderer separately as for upstream x64. Open **MPC-BE arm64 (x64 plug-ins)** from the Start menu, then select it in Video options. Availability depends on the renderer, graphics driver and device. |
 | Intel MVC and Logitech LCD | The compatibility player includes upstream's Intel MVC software runtime and links its Logitech LCD SDK. Device-specific functionality requires the corresponding hardware or software. |
 
@@ -32,4 +33,6 @@ The default player, its internal codecs and its bundled DirectShow filters are n
 
 ## Cloud verification
 
-GitHub Actions builds the application on Ubuntu and Windows. A Windows 11 Arm runner drives the setup wizard and reads the renderer choices from the installed application. It plays FLAC, H.264 and AV1 media and checks that the playback clock advances. A separate H.264 check selects MPC Video Renderer, checks the loaded renderer module and requests a rendered JPEG frame from the player's loopback web interface. Physical HDR displays, protected HDMI paths and keyboard LCDs require hardware testing.
+GitHub Actions builds the application on Ubuntu and Windows. A Windows 11 Arm runner drives the setup wizard, checks upgrades and reads the renderer choices from the installed application. It plays FLAC, H.264 and AV1 media and checks that the playback clock advances.
+
+The playback jobs select MPC Video Renderer in both players and test the x64 Haali, madVR and FrankyRenderer releases in the compatibility player. They check the loaded renderer module and retrieve a rendered JPEG from MPC-BE. The native source filters are exercised with an AviSynth+ script and a bitmap. A stereoscopic H.264 sample exercises the Intel software MVC runtime. Physical HDR displays, protected HDMI paths and keyboard LCDs require hardware testing.
