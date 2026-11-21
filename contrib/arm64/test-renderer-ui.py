@@ -54,6 +54,8 @@ try:
                     raise RuntimeError('MPC Video Renderer unavailable in Video options')
                 if any(i not in options for i in (2,3,4,6,7,8,10,11)):
                     raise RuntimeError('Missing upstream renderer entry')
+                if '--franky' in sys.argv and options[8] != 'FrankyRenderer':
+                    raise RuntimeError('The installed x64 FrankyRenderer is unavailable')
                 sys.exit(0)
     raise RuntimeError('Could not open the Video options page')
 finally:

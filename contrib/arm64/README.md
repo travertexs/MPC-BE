@@ -1,24 +1,35 @@
 # MPC-BE for Windows on Arm
 
-The `windows-arm64` branch builds the upstream MFC player, DirectShow filters and resources for the ARM64 ABI. Extract the entire portable package into one folder and launch `mpc-be-arm64.exe`. The English UI is embedded in the player. The other upstream languages are in the `Lang` folder.
+The `arm64/upstream` branch follows MPC-BE development. Version 1.9.3.30 incorporates upstream revision [601f477](https://github.com/Aleksoid1978/MPC-BE/commit/601f4772c0ffaadd8088089e4d4460af6a8e7ff7).
 
-## Windows installer
+## Installation
 
-Open the release EXE for MPC-BE's interactive Inno Setup wizard. Windows lists the player as **MPC-BE arm64 1.9.3**. Setup reuses the upstream 64-bit installer's AppId, registry view, install folder, settings and executable name (`mpc-be64.exe`). An existing upstream x64 installation upgrades in place. Setup removes the previously published 1.9.3 ARM64 MSI after you confirm installation. The Intel MVC runtime and the upstream x86/x64-only external DirectShow filters are omitted from the component list.
+Open the release EXE to start the upstream interactive setup wizard. Choose **MPC-BE arm64** in the Start menu for normal playback. To choose a renderer, open **View → Options → Video**. MPC Video Renderer is selected for installation by default. The custom installation includes checkboxes for MPC Script Source and MPC Image Source.
 
-## Build and runtime checks
+Setup uses the upstream 64-bit installer identity, registry view, settings and `mpc-be64.exe` filename. The default location is `Program Files\MPC-BE`. Setup reuses the directory selected for a previous x64 installation and removes the original ARM64 MSI after the user confirms installation. Installed apps shows **MPC-BE arm64 1.9.3.30**.
 
-The Windows ARM64 workflow cross-compiles the vendored FFmpeg source on Ubuntu with LLVM-MinGW targeting Windows UCRT. Visual Studio 2022 on a Windows runner compiles the player, filters and resource DLLs for ARM64 and links the native codec archives. The playback job downloads the same package on a GitHub-hosted Windows 11 Arm machine. It checks the PE machine fields and uses MPC-BE's web interface on loopback to confirm the file name, media duration and advancing playback position. The fixtures contain FLAC audio, H.264 in MP4 and AV1 in Matroska. The uncompressed null renderers let the test exercise decoding without requiring physical speakers or a GPU display.
+## Video renderers and plug-ins
 
-## Dependencies
-
-| Component | Windows ARM64 implementation |
+| Component | How to use it on Windows 11 Arm |
 | --- | --- |
-| FFmpeg | FFmpeg revision 11ef8d60d6, the revision used by MPC-BE 1.9.3. The build overlays MPC-BE’s modified sources and its codec registry on the full upstream tree, then compiles the enabled AArch64 and NEON routines. The Windows Arm test checks the active vector-multiply implementation and its output. |
-| dav1d and FDK AAC | The workflow builds dav1d 1.5.4 and FDK AAC 2.0.3 from source for ARM64 using LLVM-MinGW for dav1d and MSVC for FDK AAC. The FFmpeg interfaces use matching public headers. dav1d includes AArch64 assembly. |
-| MFC, ATL, Windows SDK and DirectShow | Microsoft's ARM64 compiler, static libraries and SDK imports. The DirectShow BaseClasses sources come from MPC-BE's pinned submodule. |
-| Audio, pixel conversion and subtitle routines | Existing SSE intrinsics above the codec layer compile to Arm instructions through a pinned sse2neon header. AVX2-only subtitle routines use the 128-bit implementation on Arm. |
-| Other internal libraries | The Visual Studio build compiles the repository's FLAC, SoXR, Speex, PNG, zlib, Little CMS, MediaInfo, ZenLib, Bento4, Detours, uavs3d and vvdec sources for ARM64. Architecture-specific filters and libraries use their portable implementations where necessary. |
-| Logitech LCD | The repository ships an Intel-architecture lgLcd SDK library. The ARM64 player omits the optional keyboard LCD integration. |
+| Enhanced Video Renderer, EVR custom presenter, Sync Video Renderer and the two null renderers | Available in the native player's Video options. |
+| MPC Video Renderer | Select the component in setup, then select the renderer in Video options. The renderer, its pixel conversion routines and its fullscreen hooks are compiled for ARM64. |
+| MPC Script Source and MPC Image Source | Select the relevant component in setup. These DirectShow filters are compiled for ARM64. Script playback requires the corresponding AviSynth+ or VapourSynth runtime for the player's architecture. |
+| x64-only external renderers including Haali, madVR and FrankyRenderer | Install the renderer separately as for upstream x64. Open **MPC-BE arm64 (x64 plug-ins)** from the Start menu, then select it in Video options. Availability depends on the renderer, graphics driver and device. |
+| Intel MVC and Logitech LCD | The compatibility player includes upstream's Intel MVC software runtime and links its Logitech LCD SDK. Device-specific functionality requires the corresponding hardware or software. |
 
-Intel Media SDK MVC decoding requires Intel's external runtime. Third-party DirectShow filters loaded into this player also need a compatible ARM64 binary. The package uses Windows' built-in rendering facilities and does not bundle the upstream x86 or x64 optional renderer DLLs.
+The default player, its internal codecs and its bundled DirectShow filters are native ARM64. The second player runs a native ARM64EC build of the application with upstream x64 codec and filter libraries. Windows runs its x64 code under emulation. The compatibility player lives under `Compatibility` in the same installation. Its private x64 filters use an application manifest so the main player can keep the native filters registered.
+
+## Native dependencies
+
+| Component | Implementation |
+| --- | --- |
+| FFmpeg | The build starts from FFmpeg revision `e8574d0b22`, overlays MPC-BE's matching modifications and codec registrations, and builds its AArch64 and NEON implementations for Windows. |
+| dav1d and FDK AAC | dav1d 1.5.5 includes AArch64 assembly. FDK AAC 2.0.3 is compiled with the Windows ARM64 C++ toolchain. |
+| MFC, ATL, Windows SDK and DirectShow | Microsoft's ARM64 compiler and libraries plus the pinned DirectShow BaseClasses source. |
+| Audio, pixel conversion and subtitles | Existing SSE intrinsics above the codec layer map to NEON through the pinned sse2neon header. Subtitle routines with an AVX2 variant use the 128-bit implementation. |
+| Other internal libraries | The native build compiles the repository's FLAC, SoXR, Speex, PNG, zlib, Little CMS, MediaInfo, ZenLib, Bento4, Detours, uavs3d and vvdec sources. |
+
+## Cloud verification
+
+GitHub Actions builds the application on Ubuntu and Windows. A Windows 11 Arm runner drives the setup wizard and reads the renderer choices from the installed application. It plays FLAC, H.264 and AV1 media and checks that the playback clock advances. A separate H.264 check selects MPC Video Renderer, checks the loaded renderer module and requests a rendered JPEG frame from the player's loopback web interface. Physical HDR displays, protected HDMI paths and keyboard LCDs require hardware testing.

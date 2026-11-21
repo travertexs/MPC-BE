@@ -46,6 +46,18 @@ if ($LASTEXITCODE) { throw 'Video renderer options test failed' }
 if (!(Test-Path "$defaultFolder/Filters/MpcVideoRenderer64.ax")) { throw 'Default install omitted MPC Video Renderer' }
 Uninstall-Player
 
+# Upgrade the interactive ARM64 installer that previously omitted all three filters.
+$previous = Join-Path $env:RUNNER_TEMP 'mpc-be-arm64-setup2.exe'
+Invoke-WebRequest 'https://github.com/travertexs/MPC-BE/releases/download/1.9.3-arm64-setup.2/MPC-BE.1.9.3.arm64.exe' -OutFile $previous
+if ((Get-FileHash $previous).Hash -ne '7f05b63b177249e375e1074892df13b51c6b26847c873a7d8989c1ca52b54b29') { throw 'Unexpected previous ARM64 installer' }
+Invoke-Setup $previous "$flags /LOG=previous-arm64.log"
+Invoke-Setup $setup "$flags /LOG=arm64-upgrade.log"
+Assert-Installation $defaultFolder
+if (!(Test-Path "$defaultFolder/Filters/MpcVideoRenderer64.ax") -or !(Test-Path "$defaultFolder/Compatibility/mpc-be64.exe")) {
+    throw 'Upgrade with previous default component choices omitted a new default component'
+}
+Uninstall-Player
+
 # Recreate both entries from the reported machine, including a non-default upstream directory.
 $fixtures = Join-Path $env:RUNNER_TEMP 'setup-fixtures'
 New-Item $fixtures -ItemType Directory -Force | Out-Null
@@ -81,6 +93,16 @@ foreach ($clsid in '71F080AA-8661-4093-B15E-4F6903E77D0A','7D3BBD5A-880D-4A30-A2
 }
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory $folder -PlayerName mpc-be64.exe
 & ./contrib/arm64/test-playback.ps1 -PlayerDirectory (Join-Path $folder Compatibility) -PlayerName mpc-be64.exe -Compatibility
+$franky = Join-Path $fixtures 'franky.zip'
+Invoke-WebRequest 'https://github.com/mryx007/FrankyRenderer/releases/download/v1.2.2/FrankyRenderer-1.2.2-x64.zip' -OutFile $franky
+if ((Get-FileHash $franky).Hash -ne '4b525ea1e23b7b672dfe5942b9a74ad459c968594a89264a74c05deff58adaed') { throw 'Unexpected FrankyRenderer release' }
+Expand-Archive $franky $fixtures
+$filterPath = (Get-ChildItem $fixtures -Recurse -Filter FrankyRenderer.ax).FullName
+Invoke-Setup regsvr32.exe "/s `"$filterPath`""
+python ./contrib/arm64/test-renderer-ui.py "$folder/Compatibility/mpc-be64.exe" --franky
+if ($LASTEXITCODE) { throw 'ARM64EC renderer options test failed' }
+& ./contrib/arm64/test-playback.ps1 -PlayerDirectory (Join-Path $folder Compatibility) -PlayerName mpc-be64.exe -Compatibility -Franky
+Invoke-Setup regsvr32.exe "/s /u `"$filterPath`""
 Remove-Item -LiteralPath "$folder/Compatibility/mpc-be64.ini"
 Remove-Item -LiteralPath $ini
 Uninstall-Player

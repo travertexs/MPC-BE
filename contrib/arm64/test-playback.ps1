@@ -1,4 +1,4 @@
-param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility)
+param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility, [switch]$Franky)
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path (Join-Path $PlayerDirectory $PlayerName)).Path
@@ -26,7 +26,7 @@ LocalhostOnly=1
 "@
 [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
 
-function Test-Playback([string]$media, [int]$port, [switch]$checkRenderer) {
+function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
     $name = [IO.Path]::GetFileName($media)
     $p = Start-Process $exe -ArgumentList @('/new','/play','/webport',$port,('"' + $media + '"')) -PassThru
     try {
@@ -40,12 +40,12 @@ function Test-Playback([string]$media, [int]$port, [switch]$checkRenderer) {
             if ($html -notmatch 'id="position">(\d+)<') { continue }
             $pos = [int]$Matches[1]
             if ($null -ne $before -and $pos -gt $before+500) {
-                if ($checkRenderer) {
+                if ($rendererModule) {
                     $p.Refresh()
-                    if ('MpcVideoRenderer64.ax' -notin $p.Modules.ModuleName) { throw 'MPC Video Renderer was not loaded' }
+                    if ($rendererModule -notin $p.Modules.ModuleName) { throw "$rendererModule was not loaded" }
                     $frame = (Invoke-WebRequest "http://127.0.0.1:$port/snapshot.jpg" -TimeoutSec 5).Content
                     if ($frame.Length -lt 512 -or $frame[0] -ne 255 -or $frame[1] -ne 216) { throw 'No rendered JPEG frame' }
-                    Write-Host "MPC Video Renderer loaded and MPC-BE returned a $($frame.Length)-byte JPEG."
+                    Write-Host "$rendererModule loaded and MPC-BE returned a $($frame.Length)-byte JPEG."
                 }
                 Write-Host "ARM64 player opened $name. Duration 16000 ms. Position advanced from $before to $pos ms."
                 return
@@ -60,6 +60,12 @@ function Test-Playback([string]$media, [int]$port, [switch]$checkRenderer) {
 }
 
 $port = 17581
+if ($Franky) {
+    $settings = $settings.Replace('VideoRenderer=11','VideoRenderer=8').Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
+    [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
+    Test-Playback (Resolve-Path 'media/h264.mp4').Path $port -rendererModule 'FrankyRenderer.ax'
+    return
+}
 foreach ($name in 'tone.flac','h264.mp4','av1.mkv') {
     Test-Playback (Resolve-Path "media/$name").Path $port
     $port++
@@ -67,4 +73,4 @@ foreach ($name in 'tone.flac','h264.mp4','av1.mkv') {
 
 $settings = $settings.Replace('VideoRenderer=11','VideoRenderer=5').Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
 [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
-Test-Playback (Resolve-Path 'media/h264.mp4').Path $port -checkRenderer
+Test-Playback (Resolve-Path 'media/h264.mp4').Path $port -rendererModule 'MpcVideoRenderer64.ax'

@@ -3,12 +3,11 @@ on:
   push:
     branches: ['arm64/upstream']
     paths-ignore:
-      - '.github/workflows/renderer-check.yml'
       - 'contrib/arm64/README.md'
   workflow_dispatch:
 env:
-  MPCBE_UPSTREAM_REV: 29
-  RELEASE_VERSION: 1.9.3.29
+  MPCBE_UPSTREAM_REV: 30
+  RELEASE_VERSION: 1.9.3.30
 permissions:
   contents: read
 concurrency:
@@ -95,7 +94,7 @@ jobs:
         name: Build the upstream x64 static filter libraries
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
-          $env:_CL_ = '/GL-'
+          $env:_CL_ = '/GL- /DMPC_ARM64EC_HOST'
           & "$vs\MSBuild\Current\Bin\amd64\MSBuild.exe" src/apps/mplayerc/mpc-be.vcxproj /m:3 /p:Configuration=Release /p:Platform=x64 "/p:SolutionDir=$pwd\" /p:CL_MPCount=2 /v:minimal
           if ($LASTEXITCODE) {exit $LASTEXITCODE}
       - if: steps.deps.outputs.cache-hit != 'true'

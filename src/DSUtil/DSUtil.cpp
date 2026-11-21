@@ -751,7 +751,7 @@ HRESULT CheckFilterCLSID(const CLSID& clsid)
 					&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buf, &len)
 					&& ::PathFileExistsW(buf)) {
 
-#if defined(_M_ARM64) || defined(_M_ARM64EC)
+#if defined(_M_ARM64) || defined(MPC_ARM64EC_HOST)
 				// Arm64 and x64 share the 64-bit registry. Confirm an in-process filter
 				// can actually load under this player's ABI before offering it.
 				CComPtr<IClassFactory> factory;

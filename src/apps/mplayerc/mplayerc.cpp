@@ -998,11 +998,13 @@ BOOL CMPlayerCApp::InitInstance()
 	GetAppSavePath(appSavePath);
 
 	if (m_Profile.GetSettingsLocation() != SETS_PROGRAMDIR) {
+#ifndef _M_ARM64EC
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 			CString path = GetProgramPath();
 			key.SetStringValue(L"ExePath", path);
 		}
+#endif
 
 		// checking for the existence of the Shader and Shaders11 folders
 		BOOL bShaderDirExists = ::PathFileExistsW(appSavePath + L"Shaders");

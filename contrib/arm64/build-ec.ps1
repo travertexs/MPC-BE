@@ -41,10 +41,10 @@ if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
 $dumpbin = Get-ChildItem "$vs/VC/Tools/MSVC/*/bin/Hostx64/x64/dumpbin.exe" | Sort-Object FullName -Descending | Select-Object -First 1
 $headers = & $dumpbin.FullName /headers /loadconfig ec-player/mpc-be64.exe
-if ($LASTEXITCODE -or !($headers -match 'ARM64EC|\b[1-9A-F][0-9A-F]{6,}\s+CHPE metadata')) {
+if ($LASTEXITCODE -or !($headers -match '8664 machine \(x64\) \(ARM64X\)')) {
     throw 'The compatibility player has no ARM64EC hybrid image metadata'
 }
-$headers | Select-String -Pattern 'ARM64EC|CHPE metadata' | Write-Host
+$headers | Select-String -Pattern 'ARM64X|CHPE metadata' | Write-Host
 
 git submodule update --init --depth 1 -- distrib/MPC_components
 if ($LASTEXITCODE) {exit $LASTEXITCODE}
