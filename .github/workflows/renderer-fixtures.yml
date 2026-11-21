@@ -1,0 +1,33 @@
+name: Verify external renderer fixtures
+on:
+  push:
+    branches: ['arm64/upstream']
+    paths:
+      - '.github/workflows/renderer-fixtures.yml'
+permissions:
+  actions: read
+  contents: read
+jobs:
+  external:
+    strategy:
+      fail-fast: false
+      matrix:
+        renderer: [Franky, Haali, madVR]
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44921992216
+          name: MPC-BE-ARM64-installer
+          path: installer
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 44921992216
+          name: test-media
+          path: media
+      - run: ./contrib/arm64/test-external-renderer.ps1 -Renderer ${{ matrix.renderer }}
