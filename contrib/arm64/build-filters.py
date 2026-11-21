@@ -41,6 +41,8 @@ for repo, sha, name in components:
         data = file.read_text(encoding='utf-8-sig')
         file.write_text(data.replace('x64', 'ARM64').replace('MachineX64','MachineARM64'),encoding='utf-8-sig')
     if name == 'MpcVideoRenderer':
+        for file in ('Source/Utils/Util.cpp','Source/VideoRenderer.cpp'):
+            edit(root/file, 'L#VALUE', 'L"" #VALUE')
         # Use the ARM64 implementation for the renderer's existing fullscreen window hooks.
         hook = checkout('m417z/minhook-detours','e7d5427ede9e658f1810e742822fab2936e058da')
         build(hook, 'src/minhook-detours.vcxproj', '/p:ConfigurationType=StaticLibrary', '/p:TargetName=minhook-arm64')

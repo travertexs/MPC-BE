@@ -36,7 +36,8 @@ jobs:
           if-no-files-found: error
       - name: Generate compressed playback fixtures
         run: |
-          sudo apt-get install -y ffmpeg
+          sudo apt-get update -qq
+          sudo apt-get install --no-install-recommends -y ffmpeg
           mkdir -p media
           ffmpeg -v error -f lavfi -i sine=frequency=440:duration=16 -c:a flac media/tone.flac
           ffmpeg -v error -f lavfi -i testsrc2=size=160x96:rate=12:duration=16 -c:v libx264 -threads 2 -pix_fmt yuv420p media/h264.mp4
@@ -61,6 +62,31 @@ jobs:
         with:
           name: native-filters
           path: filter-artifacts
+          if-no-files-found: error
+  compatibility:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prepare upstream x64 static dependencies
+        run: |
+          git submodule update --init --depth 1 -- src/ExtLib
+          if ($LASTEXITCODE) {exit $LASTEXITCODE}
+          curl.exe -fLsS --retry 3 https://raw.githubusercontent.com/Aleksoid1978/MSYS/main/MSYS_MinGW-w64_GCC_1521_x86-x64.7z -o "$env:RUNNER_TEMP/msys.7z"
+          if ($LASTEXITCODE) {exit $LASTEXITCODE}
+          7z x "$env:RUNNER_TEMP/msys.7z" -oC:\MSYS -bso0
+          if ($LASTEXITCODE) {exit $LASTEXITCODE}
+          @('@echo off','set "MPCBE_MSYS=C:\MSYS"','set "MPCBE_MINGW=C:\MSYS\mingw"') | Set-Content environments.bat -Encoding ascii
+          .\update_gcc.bat
+          .\update_revision.cmd
+      - name: Build the ARM64EC player for external x64 plug-ins
+        run: ./contrib/arm64/build-ec.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arm64ec-player
+          path: ec-player/mpc-be64.exe
           if-no-files-found: error
   player:
     needs: codecs
