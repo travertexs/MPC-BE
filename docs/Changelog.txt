@@ -1,5 +1,31 @@
 ﻿This file includes only a short list of the changes between Media Player Classic - BE's versions.
 
+1.9.3.x dev
+=============================
+MpaSplitter
+Added ignoring of EXE and DLL files.
+
+Subtitles
+Improved support for PGS subtitles in HDR videos.
+Added support for offset in the Simple LRC format (.lrc).
+
+yt-dlp
+Improved audio track selection (using the "source_preference" property).
+
+Player
+Added support for ARE Audio Renderer.
+Improved detection of the main video for Ultra HD Blu-ray.
+
+Installer
+Updated images for the installer interface.
+
+Updated Italian translation (by mapi68).
+
+Updated libraries:
+	dav1d 1.5.5;
+	ffmpeg n9.2-dev-1099-ge8574d0b22.
+
+
 1.9.3 - 2026-11-05
 =============================
 AudioSplitter

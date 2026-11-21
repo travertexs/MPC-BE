@@ -11648,7 +11648,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			hr = m_pVW->SetWindowPosition(rWnd.left, rWnd.top, wnd_w, wnd_h);
 
 			if (m_pMFVDC) {
-				m_pMFVDC->SetVideoPosition(nullptr, rWnd);
+				m_pMFVDC->SetVideoPosition(nullptr, rVid);
 			}
 		}
 
@@ -11658,7 +11658,12 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			}
 		}
 
-		m_wndView.SetVideoRect(rWnd);
+		if (GetRenderersSettings().iVideoRenderer == VIDRNDT_EVR) {
+			m_wndView.SetVideoRect(rVid);
+		} else {
+			// A hack to prevent subtitles in the black bars from being erased when moving the player window.
+			m_wndView.SetVideoRect(rWnd);
+		}
 
 		if (bShowStats && rVid.Height() > 0) {
 			CString info;
@@ -14585,6 +14590,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			m_pVideoWnd->GetClientRect(&Rect);
 			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			m_pMFVDC->SetVideoPosition(nullptr, &Rect);
+			m_pMFVDC->SetAspectRatioMode(MFVideoARMode_None); // to control the frame position for EVR
 
 			m_pPlaybackNotify = m_pMFVDC;
 		}
@@ -16798,6 +16804,13 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 	}
 
 	if (m_pCAP) {
+		if (CComQIPtr<ISubPicProvider> pSubPicProvider = m_pCurrentSubStream.p) {
+			bool bIsPGS = pSubPicProvider->GetType() == ST_HDMV;
+			if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP.p) {
+				pIExFilterConfig->Flt_SetBool("pgs_subtitles", bIsPGS);
+			}
+		}
+
 		m_pCAP->SetSubpicSettings(&s.m_VRSettings.SubpicSets);
 
 		g_bExternalSubtitle = (std::find(m_ExternalSubstreams.cbegin(), m_ExternalSubstreams.cend(), pSubStream) != m_ExternalSubstreams.cend());

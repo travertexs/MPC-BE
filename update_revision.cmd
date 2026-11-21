@@ -72,7 +72,7 @@ ECHO #define REV_NUM %GIT_REV_COUNT% >> revision.h
 IF EXIST %DstManifest% DEL /Q %DstManifest%
 powershell -Command "(gc %SrcManifest%) -replace '_REV_NUM_', '%GIT_REV_COUNT%' | Out-File -encoding UTF8 %DstManifest%"
 
-ECHO The revision number is %GIT_REV_COUNT%.
+ECHO Revision number %GIT_REV_COUNT% has been updated.
 
 :END
 POPD
@@ -80,5 +80,5 @@ ENDLOCAL
 EXIT /B
 
 :DONT_UPDATE
-ECHO The revision number is up to date.
+ECHO Revision number %GIT_REV_COUNT% is valid.
 GOTO END
