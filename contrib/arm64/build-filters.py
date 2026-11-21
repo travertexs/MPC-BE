@@ -46,6 +46,7 @@ for repo, sha, name in components:
         build(hook, 'src/minhook-detours.vcxproj', '/p:ConfigurationType=StaticLibrary', '/p:TargetName=minhook-arm64')
         lib = next(hook.rglob('minhook-arm64.lib'))
         project = root/'Source/MpcVideoRenderer.vcxproj'
+        edit(root/'common.props','/Zc:rvalueCast','/Zc:rvalueCast /Zc:preprocessor')
         data = project.read_text(encoding='utf-8-sig')
         start = data.index('    <ProjectReference Include="..\\external\\minhook.vcxproj">')
         end = data.index('</ProjectReference>', start) + len('</ProjectReference>')
