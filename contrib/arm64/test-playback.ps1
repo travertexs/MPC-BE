@@ -1,5 +1,5 @@
 param([string]$PlayerDirectory = "player", [string]$PlayerName = "mpc-be-arm64.exe", [switch]$Compatibility,
-      [ValidateSet('Franky','Haali','madVR')][string]$ExternalRenderer)
+      [ValidateSet('Franky','Haali','madVR')][string]$ExternalRenderer, [switch]$Mvc)
 $ErrorActionPreference = 'Stop'
 if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture -ne 'Arm64') { throw 'ARM64 Windows required' }
 $exe = (Resolve-Path (Join-Path $PlayerDirectory $PlayerName)).Path
@@ -27,7 +27,7 @@ LocalhostOnly=1
 "@
 [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
 
-function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
+function Test-Playback([string]$media, [int]$port, [string]$rendererModule, [int]$expectedDuration = 16000) {
     $name = [IO.Path]::GetFileName($media)
     $p = Start-Process $exe -ArgumentList @('/new','/play','/webport',$port,('"' + $media + '"')) -PassThru
     try {
@@ -37,7 +37,9 @@ function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
             if ($p.HasExited) { throw "Player exited with $($p.ExitCode)" }
             Start-Sleep -Milliseconds 500
             try { $html = (Invoke-WebRequest "http://127.0.0.1:$port/variables.html" -TimeoutSec 2).Content } catch { continue }
-            if ($html -notmatch [regex]::Escape($name) -or $html -notmatch 'id="duration">(\d+)<' -or [int]$Matches[1] -ne 16000) { continue }
+            if ($html -notmatch [regex]::Escape($name) -or $html -notmatch 'id="duration">(\d+)<') { continue }
+            $duration = [int]$Matches[1]
+            if ($duration -le 0 -or ($expectedDuration -gt 0 -and $duration -ne $expectedDuration)) { continue }
             if ($html -notmatch 'id="position">(\d+)<') { continue }
             $pos = [int]$Matches[1]
             if ($null -ne $before -and $pos -gt $before+500) {
@@ -48,7 +50,7 @@ function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
                     if ($frame.Length -lt 512 -or $frame[0] -ne 255 -or $frame[1] -ne 216) { throw 'No rendered JPEG frame' }
                     Write-Host "$rendererModule loaded and MPC-BE returned a $($frame.Length)-byte JPEG."
                 }
-                Write-Host "ARM64 player opened $name. Duration 16000 ms. Position advanced from $before to $pos ms."
+                Write-Host "Player opened $name. Duration $duration ms. Position advanced from $before to $pos ms."
                 return
             }
             if ($null -eq $before) { $before = $pos }
@@ -61,6 +63,16 @@ function Test-Playback([string]$media, [int]$port, [string]$rendererModule) {
 }
 
 $port = 17581
+if ($Mvc) {
+    $sample = Join-Path $env:RUNNER_TEMP 'small-00000.ssif'
+    Invoke-WebRequest 'https://samples.ffmpeg.org/3D/small-00000.ssif' -OutFile $sample
+    if ((Get-FileHash $sample).Hash -ne 'b08d8f72575cd1e8eb0cd66519dd56dbd1e742f0a0bb2d34436c32a0d5c266cd') { throw 'Unexpected MVC sample' }
+    $settings = $settings.Replace('VideoRenderer=11','VideoRenderer=5').Replace('LocalhostOnly=1',"LocalhostOnly=1`r`nEnablePreview=1")
+    $settings += "`r`n[InternalFilters]`r`nvdec_h264_mvc=1`r`n"
+    [IO.File]::WriteAllText($ini, $settings, [Text.Encoding]::Unicode)
+    Test-Playback $sample $port -rendererModule 'libmfxsw64.dll' -expectedDuration 0
+    return
+}
 if ($ExternalRenderer) {
     $rendererId, $module = switch ($ExternalRenderer) {
         'Franky' { 8; 'FrankyRenderer.ax' }

@@ -9,10 +9,6 @@ permissions:
   contents: read
 jobs:
   external:
-    strategy:
-      fail-fast: false
-      matrix:
-        renderer: [Haali]
     runs-on: windows-11-arm
     steps:
       - uses: actions/checkout@v4
@@ -30,4 +26,8 @@ jobs:
           run-id: 44921992216
           name: test-media
           path: media
-      - run: ./contrib/arm64/test-external-renderer.ps1 -Renderer ${{ matrix.renderer }}
+      - run: |
+          $exe = Get-ChildItem installer/*.exe
+          $p = Start-Process $exe.FullName '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LANG=en' -Wait -PassThru
+          if ($p.ExitCode) {exit $p.ExitCode}
+          ./contrib/arm64/test-playback.ps1 -Compatibility -PlayerDirectory "$env:ProgramFiles/MPC-BE/Compatibility" -PlayerName mpc-be64.exe -Mvc
