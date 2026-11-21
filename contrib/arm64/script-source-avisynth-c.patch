@@ -1,0 +1,435 @@
+diff --git a/Source/AviSynthStream.cpp b/Source/AviSynthStream.cpp
+index d270ecc..1e704b0 100644
+--- a/Source/AviSynthStream.cpp
++++ b/Source/AviSynthStream.cpp
+@@ -12,7 +12,6 @@
+ 
+ #include <mmreg.h>
+ 
+-const AVS_Linkage* AVS_linkage = NULL;
+ 
+ std::wstring ConvertUtf8OrAnsiLinesToWide(const std::string_view sv)
+ {
+@@ -52,28 +51,10 @@ std::wstring ConvertUtf8OrAnsiLinesToWide(const std::string_view sv)
+ 
+ CAviSynthFile::CAviSynthFile(const WCHAR* name, CSource* pParent, HRESULT* phr)
+ {
+-	try {
+-		m_hAviSynthDll = LoadLibraryW(L"Avisynth.dll");
+-		if (!m_hAviSynthDll) {
+-			throw std::exception("Failed to load AviSynth+");
+-		}
+-
+-		IScriptEnvironment* (WINAPI* CreateScriptEnvironment)(int version) =
+-			(IScriptEnvironment * (WINAPI*)(int)) GetProcAddress(m_hAviSynthDll, "CreateScriptEnvironment");
+-
+-		if (!CreateScriptEnvironment) {
+-			throw std::exception("Cannot resolve AviSynth+ CreateScriptEnvironment function");
+-		}
+-
+-		m_ScriptEnvironment = CreateScriptEnvironment(6);
+-		if (!m_ScriptEnvironment) {
+-			throw std::exception("A newer AviSynth+ version is required");
+-		}
+-
+-		AVS_linkage = m_Linkage = m_ScriptEnvironment->GetAVSLinkage();
+-	}
+-	catch ([[maybe_unused]] const std::exception& e) {
+-		DLog(ConvertAnsiToWide(e.what()));
++	// The published Windows ARM64 runtime uses LLVM-MinGW. Its C API
++	// also supports MSVC hosts and keeps C++ objects inside the runtime.
++	m_Library = avs_load_library(nullptr);
++	if (!m_Library || !(m_ScriptEnvironment = avs_library_create_script_environment(m_Library))) {
+ 		*phr = E_FAIL;
+ 		return;
+ 	}
+@@ -83,24 +64,21 @@ CAviSynthFile::CAviSynthFile(const WCHAR* name, CSource* pParent, HRESULT* phr)
+ 
+ 	try {
+ 		std::string utf8file = ConvertWideToUtf8(name);
+-		AVSValue args[2] = { utf8file.c_str(), true };
+-		const char* const arg_names[2] = { 0, "utf8" };
+-		try {
+-			m_AVSValue = m_ScriptEnvironment->Invoke("Import", AVSValue(args, 2), arg_names);
++		AVS_Value args[] = { avs_new_value_string(utf8file.c_str()), avs_new_value_bool(1) };
++		const char* names[] = { nullptr, "utf8" };
++		AVS_Value result = m_Library->avs_invoke(m_ScriptEnvironment, "Import", avs_new_value_array(args, 2), names);
++		if (avs_is_error(result)) {
++			error = ConvertUtf8OrAnsiLinesToWide(avs_as_error(result));
++		} else if (avs_is_clip(result)) {
++			m_Clip = m_Library->avs_take_clip(result, m_ScriptEnvironment);
+ 		}
+-		catch (const AvisynthError& e) {
+-			error = ConvertUtf8OrAnsiLinesToWide(e.msg);
+-			throw std::exception("Failure to open Avisynth script file.");
+-		}
+-
+-		if (!m_AVSValue.IsClip()) {
+-			throw std::exception("AviSynth+ script does not return a video clip");
++		m_Library->avs_release_value(result);
++		if (!m_Clip) {
++			throw std::runtime_error("AviSynth+ did not return a clip");
+ 		}
++		const auto& VInfo = *m_Library->avs_get_video_info(m_Clip);
+ 
+-		auto Clip = m_AVSValue.AsClip();
+-		auto VInfo = Clip->GetVideoInfo();
+-
+-		if (VInfo.HasVideo()) {
++		if (avs_has_video(&VInfo)) {
+ 			auto& Format = GetFormatParamsAviSynth(VInfo.pixel_type);
+ 			if (Format.fourcc == DWORD(-1)) {
+ 				throw std::exception(std::format("Unsuported pixel_type {:#010x} ({})", (uint32_t)VInfo.pixel_type, VInfo.pixel_type).c_str());
+@@ -118,7 +96,7 @@ CAviSynthFile::CAviSynthFile(const WCHAR* name, CSource* pParent, HRESULT* phr)
+ 			}
+ 		}
+ 
+-		if (VInfo.HasAudio()) {
++		if (avs_has_audio(&VInfo)) {
+ 			auto pAudioStream = new CAviSynthAudioStream(this, pParent, &hr);
+ 			if (FAILED(hr)) {
+ 				DLog(L"AviSynth+ script returned unsupported audio");
+@@ -149,23 +127,22 @@ CAviSynthFile::CAviSynthFile(const WCHAR* name, CSource* pParent, HRESULT* phr)
+ 
+ CAviSynthFile::~CAviSynthFile()
+ {
+-	AVS_linkage = m_Linkage;
+-
+-	m_AVSValue = 0;
+-
++	if (m_Clip) {
++		m_Library->avs_release_clip(m_Clip);
++	}
+ 	if (m_ScriptEnvironment) {
+-		m_ScriptEnvironment->DeleteScriptEnvironment();
+-		m_ScriptEnvironment = nullptr;
++		m_Library->avs_delete_script_environment(m_ScriptEnvironment);
+ 	}
+-
+-	AVS_linkage = nullptr;
+-	m_Linkage = nullptr;
+-
+-	if (m_hAviSynthDll) {
+-		FreeLibrary(m_hAviSynthDll);
++	if (m_Library) {
++		avs_free_library(m_Library);
+ 	}
+ }
+ 
++CAviSynthFile::Frame CAviSynthFile::GetFrame(int index) const
++{
++	return Frame(m_Library->avs_get_frame(m_Clip, index), m_Library->avs_release_video_frame);
++}
++
+ //
+ // CAviSynthVideoStream
+ //
+@@ -181,18 +158,21 @@ CAviSynthVideoStream::CAviSynthVideoStream(CAviSynthFile* pAviSynthFile, CSource
+ 	std::wstring error;
+ 
+ 	try {
+-		auto Clip = m_pAviSynthFile->m_AVSValue.AsClip();
+-		auto VInfo = Clip->GetVideoInfo();
++		const auto* lib = m_pAviSynthFile->m_Library;
++		const auto& VInfo = *lib->avs_get_video_info(m_pAviSynthFile->m_Clip);
+ 
+ 		m_Format = GetFormatParamsAviSynth(VInfo.pixel_type);
+ 		if (m_Format.fourcc == DWORD(-1)) {
+ 			throw std::exception(std::format("Unsuported pixel_type {:#010x} ({})", (uint32_t)VInfo.pixel_type, VInfo.pixel_type).c_str());
+ 		}
+ 
+-		UINT bitdepth = VInfo.BitsPerPixel();
++		UINT bitdepth = lib->avs_bits_per_pixel(&VInfo);
+ 
+-		auto VFrame = Clip->GetFrame(0, m_pAviSynthFile->m_ScriptEnvironment);
+-		m_Pitch = VFrame->GetPitch();
++		auto VFrame = m_pAviSynthFile->GetFrame(0);
++		if (!VFrame) {
++			throw std::runtime_error("AviSynth+ could not read the first frame");
++		}
++		m_Pitch = lib->avs_get_pitch_p(VFrame.get(), AVS_DEFAULT_PLANE);
+ 
+ 		m_Width = VInfo.width;
+ 		m_Height = VInfo.height;
+@@ -205,23 +185,23 @@ CAviSynthVideoStream::CAviSynthVideoStream(CAviSynthFile* pAviSynthFile, CSource
+ 		m_AvgTimePerFrame = UNITS * m_fpsDen / m_fpsNum; // no need any MulDiv here
+ 		m_rtDuration = m_rtStop = llMulDiv(UNITS * m_NumFrames, m_fpsDen, m_fpsNum, 0);
+ 
+-		if (VInfo.IsPlanar()) {
+-			if (VInfo.IsYUV() || VInfo.IsYUVA()) {
+-				m_Planes[0] = PLANAR_Y;
+-				if (VInfo.IsYV12() || VInfo.IsYV16() || VInfo.IsYV24()) {
+-					m_Planes[1] = PLANAR_V;
+-					m_Planes[2] = PLANAR_U;
++		if (avs_is_planar(&VInfo)) {
++			if (avs_is_yuv(&VInfo) || lib->avs_is_yuva(&VInfo)) {
++				m_Planes[0] = AVS_PLANAR_Y;
++				if (lib->avs_is_yv12(&VInfo) || lib->avs_is_yv16(&VInfo) || lib->avs_is_yv24(&VInfo)) {
++					m_Planes[1] = AVS_PLANAR_V;
++					m_Planes[2] = AVS_PLANAR_U;
+ 				} else {
+-					m_Planes[1] = PLANAR_U;
+-					m_Planes[2] = PLANAR_V;
++					m_Planes[1] = AVS_PLANAR_U;
++					m_Planes[2] = AVS_PLANAR_V;
+ 				}
+ 			}
+-			else if (VInfo.IsRGB()) {
+-				m_Planes[0] = PLANAR_G;
+-				m_Planes[1] = PLANAR_B;
+-				m_Planes[2] = PLANAR_R;
++			else if (avs_is_rgb(&VInfo)) {
++				m_Planes[0] = AVS_PLANAR_G;
++				m_Planes[1] = AVS_PLANAR_B;
++				m_Planes[2] = AVS_PLANAR_R;
+ 			}
+-			m_Planes[3] = PLANAR_A;
++			m_Planes[3] = AVS_PLANAR_A;
+ 		}
+ 
+ 		UINT color_info = 0;
+@@ -232,35 +212,28 @@ CAviSynthVideoStream::CAviSynthVideoStream(CAviSynthFile* pAviSynthFile, CSource
+ 			m_Format.str, m_Width, m_Height, (double)m_fpsNum/m_fpsDen
+ 		);
+ 
+-		bool has_at_least_v8 = true;
+-		try {
+-			m_pAviSynthFile->m_ScriptEnvironment->CheckVersion(8);
+-		}
+-		catch (const AvisynthError&) {
+-			has_at_least_v8 = false;
+-		}
+-
+-		if (has_at_least_v8) {
+-			auto& avsMap = VFrame->getConstProperties();
+-			int numKeys = m_pAviSynthFile->m_ScriptEnvironment->propNumKeys(&avsMap);
++		if (lib->has_at_least_v9) {
++			auto* env = m_pAviSynthFile->m_ScriptEnvironment;
++			const auto* avsMap = lib->avs_get_frame_props_ro(env, VFrame.get());
++			int numKeys = lib->avs_prop_num_keys(env, avsMap);
+ 			if (numKeys > 0) {
+ 				m_StreamInfo += std::format(L"\nProperties [{}]:", numKeys);
+ 			}
+ 
+ 			for (int i = 0; i < numKeys; i++) {
+-				const char* keyName = m_pAviSynthFile->m_ScriptEnvironment->propGetKey(&avsMap, i);
++				const char* keyName = lib->avs_prop_get_key(env, avsMap, i);
+ 				if (keyName) {
+ 					int64_t val_Int = 0;
+ 					double val_Float = 0;
+ 					const char* val_Data = 0;
+ 					int err = 0;
+-					const char keyType = m_pAviSynthFile->m_ScriptEnvironment->propGetType(&avsMap, keyName);
++					const char keyType = lib->avs_prop_get_type(env, avsMap, keyName);
+ 
+ 					m_StreamInfo += std::format(L"\n{:>2}: <{}> '{}'", i, keyType, A2WStr(keyName));
+ 
+ 					switch (keyType) {
+-					case PROPTYPE_INT:
+-						val_Int = m_pAviSynthFile->m_ScriptEnvironment->propGetInt(&avsMap, keyName, 0, &err);
++					case AVS_PROPTYPE_INT:
++						val_Int = lib->avs_prop_get_int(env, avsMap, keyName, 0, &err);
+ 						if (!err) {
+ 							m_StreamInfo += std::format(L" = {}", val_Int);
+ 							if (strcmp(keyName, "_SARNum") == 0) {
+@@ -274,16 +247,16 @@ CAviSynthVideoStream::CAviSynthVideoStream(CAviSynthFile* pAviSynthFile, CSource
+ 							}
+ 						}
+ 						break;
+-					case PROPTYPE_FLOAT:
+-						val_Float = m_pAviSynthFile->m_ScriptEnvironment->propGetFloat(&avsMap, keyName, 0, &err);
++					case AVS_PROPTYPE_FLOAT:
++						val_Float = lib->avs_prop_get_float(env, avsMap, keyName, 0, &err);
+ 						if (!err) {
+ 							m_StreamInfo += std::format(L" = {:.3f}", val_Float);
+ 						}
+ 						break;
+-					case PROPTYPE_DATA:
+-						val_Data = m_pAviSynthFile->m_ScriptEnvironment->propGetData(&avsMap, keyName, 0, &err);
++					case AVS_PROPTYPE_DATA:
++						val_Data = lib->avs_prop_get_data(env, avsMap, keyName, 0, &err);
+ 						if (!err) {
+-							const int dataSize = m_pAviSynthFile->m_ScriptEnvironment->propGetDataSize(&avsMap, keyName, 0, &err);
++							const int dataSize = lib->avs_prop_get_data_size(env, avsMap, keyName, 0, &err);
+ 							if (!err) {
+ 								if (dataSize == 1 && strcmp(keyName, "_PictType") == 0) {
+ 									m_StreamInfo += std::format(L" = {}", val_Data[0]);
+@@ -313,11 +286,6 @@ CAviSynthVideoStream::CAviSynthVideoStream(CAviSynthFile* pAviSynthFile, CSource
+ 
+ 		hr = E_FAIL;
+ 	}
+-	catch ([[maybe_unused]] const AvisynthError& e) {
+-		DLog(ConvertUtf8OrAnsiLinesToWide(e.msg));
+-
+-		hr = E_FAIL;
+-	}
+ 
+ 	*phr = hr;
+ }
+@@ -327,7 +295,7 @@ CAviSynthVideoStream::CAviSynthVideoStream(std::wstring_view error_str, CSource*
+ 	, CSourceSeeking(L"Video", (IPin*)this, phr, &m_cSharedState)
+ 	, m_pAviSynthFile(nullptr)
+ {
+-	m_Format = GetFormatParamsAviSynth(VideoInfo::CS_BGR32);
++	m_Format = GetFormatParamsAviSynth(AVS_CS_BGR32);
+ 
+ 	m_Width = 640;
+ 	m_Height = 360;
+@@ -558,24 +526,20 @@ HRESULT CAviSynthVideoStream::FillBuffer(IMediaSample* pSample)
+ 			}
+ 		}
+ 		else {
+-			auto Clip = m_pAviSynthFile->m_AVSValue.AsClip();
+-			PVideoFrame VFrame;
+-			try {
+-				VFrame = Clip->GetFrame(m_CurrentFrame, m_pAviSynthFile->m_ScriptEnvironment);
+-			}
+-			catch ([[maybe_unused]] const AvisynthError& e) {
+-				DLog(L"IClip::GetFrame threw an exception: {}", ConvertUtf8OrAnsiLinesToWide(e.msg));
++			const auto* lib = m_pAviSynthFile->m_Library;
++			auto VFrame = m_pAviSynthFile->GetFrame(m_CurrentFrame);
++			if (!VFrame) {
+ 				return E_FAIL;
+ 			}
+ 
+ 			const int num_planes = m_Format.planes;
+ 			for (int i = 0; i < num_planes; i++) {
+ 				const int plane = m_Planes[i];
+-				const BYTE* src_data = VFrame->GetReadPtr(plane);
+-				int src_pitch = VFrame->GetPitch(plane);
+-				const UINT height = VFrame->GetHeight(plane);
++				const BYTE* src_data = lib->avs_get_read_ptr_p(VFrame.get(), plane);
++				int src_pitch = lib->avs_get_pitch_p(VFrame.get(), plane);
++				const UINT height = lib->avs_get_height_p(VFrame.get(), plane);
+ 				UINT dst_pitch = m_PitchBuff;
+-				if ((i == 1 || i == 2) && (m_Format.ASformat & VideoInfo::CS_Sub_Width_Mask) == VideoInfo::CS_Sub_Width_2) {
++				if ((i == 1 || i == 2) && (m_Format.ASformat & AVS_CS_SUB_WIDTH_MASK) == AVS_CS_SUB_WIDTH_2) {
+ 					dst_pitch /= 2;
+ 				}
+ 
+@@ -688,19 +652,19 @@ CAviSynthAudioStream::CAviSynthAudioStream(CAviSynthFile* pAviSynthFile, CSource
+ 	std::wstring error;
+ 
+ 	try {
+-		auto Clip = m_pAviSynthFile->m_AVSValue.AsClip();
+-		auto VInfo = Clip->GetVideoInfo();
++		const auto* lib = m_pAviSynthFile->m_Library;
++		const auto& VInfo = *lib->avs_get_video_info(m_pAviSynthFile->m_Clip);
+ 
+-		if (VInfo.HasAudio()) {
+-			m_Channels       = VInfo.AudioChannels();
+-			m_SampleRate     = VInfo.SamplesPerSecond();
+-			m_BytesPerSample = VInfo.BytesPerAudioSample();
++		if (avs_has_audio(&VInfo)) {
++			m_Channels       = VInfo.nchannels;
++			m_SampleRate     = VInfo.audio_samples_per_second;
++			m_BytesPerSample = avs_bytes_per_audio_sample(&VInfo);
+ 			m_BitDepth       = m_BytesPerSample * 8 / m_Channels;
+-			m_SampleType     = (AvsSampleType)VInfo.SampleType();
++			m_SampleType     = VInfo.sample_type;
+ 			m_NumSamples     = VInfo.num_audio_samples;
+ 
+ 			WORD wFormatTag;
+-			if (m_SampleType == SAMPLE_FLOAT) {
++			if (m_SampleType == AVS_SAMPLE_FLOAT) {
+ 				wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+ 				m_Subtype = MEDIASUBTYPE_IEEE_FLOAT;
+ 			} else {
+@@ -719,15 +683,7 @@ CAviSynthAudioStream::CAviSynthAudioStream(CAviSynthFile* pAviSynthFile, CSource
+ 			m_mt.SetTemporalCompression(FALSE);
+ 			m_mt.SetSampleSize(m_BytesPerSample);
+ 
+-			bool has_at_least_v10 = true;
+-			try {
+-				m_pAviSynthFile->m_ScriptEnvironment->CheckVersion(10);
+-			}
+-			catch (const AvisynthError&) {
+-				has_at_least_v10 = false;
+-			}
+-
+-			UINT channelLayout = has_at_least_v10 ? VInfo.GetChannelMask() : 0;
++			UINT channelLayout = lib->avs_get_channel_mask ? lib->avs_get_channel_mask(&VInfo) : 0;
+ 
+ 			if (channelLayout) {
+ 				WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)m_mt.AllocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
+@@ -755,11 +711,11 @@ CAviSynthAudioStream::CAviSynthAudioStream(CAviSynthFile* pAviSynthFile, CSource
+ 
+ 			m_StreamInfo = std::format(L"Audio stream: {} channels, {} Hz, ", m_Channels, m_SampleRate);
+ 			switch (m_SampleType) {
+-			case SAMPLE_INT8:  m_StreamInfo.append(L"int8"); break;
+-			case SAMPLE_INT16: m_StreamInfo.append(L"int16"); break;
+-			case SAMPLE_INT24: m_StreamInfo.append(L"int24"); break;
+-			case SAMPLE_INT32: m_StreamInfo.append(L"int32"); break;
+-			case SAMPLE_FLOAT: m_StreamInfo.append(L"float32"); break;
++			case AVS_SAMPLE_INT8:  m_StreamInfo.append(L"int8"); break;
++			case AVS_SAMPLE_INT16: m_StreamInfo.append(L"int16"); break;
++			case AVS_SAMPLE_INT24: m_StreamInfo.append(L"int24"); break;
++			case AVS_SAMPLE_INT32: m_StreamInfo.append(L"int32"); break;
++			case AVS_SAMPLE_FLOAT: m_StreamInfo.append(L"float32"); break;
+ 			}
+ 			DLog(m_StreamInfo);
+ 
+@@ -926,13 +882,8 @@ HRESULT CAviSynthAudioStream::FillBuffer(IMediaSample* pSample)
+ 			return S_FALSE;
+ 		}
+ 
+-		auto Clip = m_pAviSynthFile->m_AVSValue.AsClip();
+ 		int64_t count = std::min<int64_t>(m_BufferSamples, m_NumSamples - m_CurrentSample);
+-		try {
+-			Clip->GetAudio(dst_data, m_CurrentSample, count, m_pAviSynthFile->m_ScriptEnvironment);
+-		}
+-		catch ([[maybe_unused]] const AvisynthError& e) {
+-			DLog(L"IClip::GetAudio threw an exception: {}", ConvertUtf8OrAnsiLinesToWide(e.msg));
++		if (m_pAviSynthFile->m_Library->avs_get_audio(m_pAviSynthFile->m_Clip, dst_data, m_CurrentSample, count)) {
+ 			return E_FAIL;
+ 		}
+ 
+diff --git a/Source/AviSynthStream.h b/Source/AviSynthStream.h
+index 846a635..8babd9d 100644
+--- a/Source/AviSynthStream.h
++++ b/Source/AviSynthStream.h
+@@ -6,9 +6,7 @@
+ 
+ #pragma once
+ 
+-#ifndef __AVISYNTH_7_H__
+-#include "../Include/avisynth.h"
+-#endif
++#include "../Include/avs-c/avisynth_c_loader.h"
+ #include "Helper.h"
+ 
+  //
+@@ -20,11 +18,12 @@ class CAviSynthFile
+ 	friend class CAviSynthVideoStream;
+ 	friend class CAviSynthAudioStream;
+ 
+-	HMODULE m_hAviSynthDll = nullptr;
++	AVS_Library* m_Library = nullptr;
++	AVS_ScriptEnvironment* m_ScriptEnvironment = nullptr;
++	AVS_Clip* m_Clip = nullptr;
+ 
+-	IScriptEnvironment* m_ScriptEnvironment = nullptr;
+-	AVSValue            m_AVSValue;
+-	const AVS_Linkage*  m_Linkage = nullptr;
++	using Frame = std::unique_ptr<AVS_VideoFrame, avs_release_video_frame_func>;
++	Frame GetFrame(int index) const;
+ 
+ 	std::wstring m_FileInfo;
+ 
+@@ -51,7 +50,6 @@ private:
+ 	BOOL m_bDiscontinuity = FALSE;
+ 	BOOL m_bFlushing = FALSE;
+ 
+-	PVideoFrame m_Frame;
+ 	int         m_Planes[4] = {};
+ 
+ 	std::unique_ptr<BYTE[]> m_BitmapError;
+@@ -135,7 +133,7 @@ private:
+ 	int m_SampleRate = 0;
+ 	int m_BytesPerSample = 0; // for all audio channels
+ 	int m_BitDepth = 0;
+-	AvsSampleType m_SampleType = (AvsSampleType)0;
++	int m_SampleType = 0;
+ 
+ 	int m_BufferSamples = 0;
+ 

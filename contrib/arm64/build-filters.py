@@ -40,6 +40,11 @@ for repo, sha, name in components:
         # These are disposable, architecture-specific builds of pinned source trees.
         data = file.read_text(encoding='utf-8-sig')
         file.write_text(data.replace('x64', 'ARM64').replace('MachineX64','MachineARM64'),encoding='utf-8-sig')
+    if name == 'MpcScriptSource':
+        avs = checkout('AviSynth/AviSynthPlus', '523370a39933e2f9c208a5d74c1d35d43d177a76')
+        shutil.copytree(avs/'avs_core/include', root/'Include/avs-c')
+        patch = Path(__file__).with_name('script-source-avisynth-c.patch').resolve()
+        subprocess.run(['git', 'apply', '--ignore-space-change', patch], cwd=root, check=True)
     if name == 'MpcVideoRenderer':
         for file in ('Source/Utils/Util.cpp','Source/VideoRenderer.cpp'):
             edit(root/file, 'L#VALUE', 'L"" #VALUE')

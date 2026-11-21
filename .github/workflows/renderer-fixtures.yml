@@ -8,7 +8,20 @@ permissions:
   actions: read
   contents: read
 jobs:
+  rebuild-filters:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
+          Invoke-WebRequest https://raw.githubusercontent.com/DLTcollab/sse2neon/2272251cc3ad9cba8b8c47c4065811cfb396b802/sse2neon.h -OutFile include/sse2neon.h
+          python contrib/arm64/build-filters.py "$vs\MSBuild\Current\Bin\amd64\MSBuild.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corrected-filters
+          path: filter-artifacts/*.ax
   external:
+    needs: rebuild-filters
     runs-on: windows-11-arm
     steps:
       - uses: actions/checkout@v4
@@ -26,10 +39,15 @@ jobs:
           run-id: 44921992216
           name: test-media
           path: media
+      - uses: actions/download-artifact@v4
+        with:
+          name: corrected-filters
+          path: corrected-filters
       - run: |
           $exe = Get-ChildItem installer/*.exe
           $p = Start-Process $exe.FullName '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /LANG=en /COMPONENTS=main,mpciconlib,mpcresources,mpcvr,mpcscriptsrc,mpcimagesrc' -Wait -PassThru
           if ($p.ExitCode) {exit $p.ExitCode}
+          Copy-Item corrected-filters/*.ax "$env:ProgramFiles/MPC-BE/Filters/" -Force
           $dumps = Join-Path $env:RUNNER_TEMP 'PlayerDumps'
           New-Item -ItemType Directory -Path $dumps -Force | Out-Null
           $wer = 'HKLM:\Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\mpc-be64.exe'
